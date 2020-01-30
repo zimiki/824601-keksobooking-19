@@ -2,7 +2,6 @@
 var OFFER_TYPE = ['palace', 'flat', 'house', 'bungalo'];
 var FEATURES = ['wifi', 'dishwasher', 'parking', 'washer', 'elevator', 'conditioner'];
 var TIME = ['12:00', '13:00', '14:00'];
-var map = document.querySelector('.map');
 
 
 // Функция генерирующая случайное число в диапазоне
@@ -11,88 +10,95 @@ var getRandom = function (min, max) {
   return Math.floor(rand);
 };
 
-// Создание массивов на 8 свойств со случайными значениями
-// a) Массив для свойства avatar вида 'img/avatars/user{{xx}}.png', где {{xx}} это число от 01 до 08. Адреса изображений не повторяются
-var userNumber = ['01', '02', '03', '04', '05', '06', '07', '08'];
+// Функция выбирающая случайный элемент массива
+var getRandomElementArr = function (arr) {
+  var rand = Math.floor(Math.random() * arr.length);
+  return arr[rand];
+};
+
+// Функция для перемешивания массива
+var getRandomMixArr = function (arr) {
+  for (var i = arr.length - 1; i > 0; i--) {
+    var j = Math.floor(Math.random() * (i + 1));
+    var swap = arr[i];
+    arr[i] = arr[j];
+    arr[j] = swap;
+  }
+  return arr;
+};
+
+
 // a) Массив для свойства location.x  - cлучайное число. Значение ограничено размерами блока, в котором перетаскивается метка
-var locationX = ['50', '100', '150', '200', '220', '360', '480', '550'];
-// a) Массив для свойства location.x  - cлучайное число от 130 до 630.
-var locationY = ['130', '100', '150', '200', '220', '360', '480', '630'];
-
-
-var offers = [
-  // Первый объект
+var randomLocation = [
   {
-    author: {
-      avatar: 'img/avatars/user' + userNumber[1] + '.png'
-    },
-    offer: {
-      title: 'Заголовок преложения # ' + 1,
-      address: locationX[1] + ', ' + locationY[1],
-      price: '5500',
-      type: OFFER_TYPE[0],
-      rooms: getRandom(1, 3), // число, количество комнат
-      guests: getRandom(1, 10), // число, количество гостей
-      checkin: TIME[getRandom(0, TIME.length)],
-      checkout: TIME[getRandom(0, TIME.length)],
-      features: FEATURES[getRandom(0, FEATURES.length)],
-      description: 'какое-то описание',
-      photos: ['http://o0.github.io/assets/images/tokyo/hotel1.jpg', 'http://o0.github.io/assets/images/tokyo/hotel2.jpg', 'http://o0.github.io/assets/images/tokyo/hotel3.jpg'],
-    },
-    location: {
-      x: locationX[0],
-      y: locationY[0]
-    },
+    x: '50',
+    y: '150'
   },
-
-  // Второй объект
   {
-    author: {
-      avatar: 'img/avatars/user01.png'
-    },
-    offer: {
-      title: 'Заголовок преложения #2',
-      address: '600, 350',
-      price: '5500',
-      type: OFFER_TYPE[0],
-      rooms: 2,
-      guests: 5,
-      checkin: TIME[2],
-      checkout: TIME[0],
-      features: FEATURES[0],
-      description: 'какое-то описание',
-      photos: ['http://o0.github.io/assets/images/tokyo/hotel1.jpg', 'http://o0.github.io/assets/images/tokyo/hotel2.jpg', 'http://o0.github.io/assets/images/tokyo/hotel3.jpg'],
-    },
-    location: {
-      x: 150,
-      y: 600
-    },
+    x: '100',
+    y: '180'
   },
-  // 3 объект
   {
-    author: {
-      avatar: 'img/avatars/user01.png'
-    },
-    offer: {
-      title: 'Заголовок преложения #2',
-      address: '600, 350',
-      price: '5500',
-      type: OFFER_TYPE[0],
-      rooms: 2,
-      guests: 5,
-      checkin: TIME[2],
-      checkout: TIME[0],
-      features: FEATURES[0],
-      description: 'какое-то описание',
-      photos: ['http://o0.github.io/assets/images/tokyo/hotel1.jpg', 'http://o0.github.io/assets/images/tokyo/hotel2.jpg', 'http://o0.github.io/assets/images/tokyo/hotel3.jpg'],
-    },
-    location: {
-      x: 150,
-      y: 130
-    },
+    x: '150',
+    y: '200'
+  },
+  {
+    x: '200',
+    y: '230'
+  },
+  {
+    x: '250',
+    y: '500'
+  },
+  {
+    x: '300',
+    y: '100'
+  },
+  {
+    x: '350',
+    y: '150'
+  },
+  {
+    x: '400',
+    y: '180'
   }
 ];
-console.log(offers[0]);
+
+var renderMockData = function () {
+  var SIMILAR_ELEMENT = 8;
+  // Создание массива для avatar со случайным порядком неповторяющихся значений от 01-08
+  var avatarNumber = ['01', '02', '03', '04', '05', '06', '07', '08'];
+  var avatarRandNumber = getRandomMixArr(avatarNumber);
+
+  var arr = [];
+  for (var i = 0; i < SIMILAR_ELEMENT; i++) {
+    var element = {
+      author: {
+        avatar: 'img/avatars/user' + avatarRandNumber[i] + '.png' // строка, адрес изображения вида img/avatars/user{{xx}}.png, где {{xx}} - число от 01 до 08 не повторяются
+      },
+      offer: {
+        title: 'Заголовок преложения # ' + 1, // строка, заголовок предложения
+        address: randomLocation[i].x + ', ' + randomLocation[i].y, // строка представляет собой запись вида "{{location.x}}, {{location.y}}
+        price: '5500', // число, стоимость
+        type: getRandomElementArr(OFFER_TYPE), // строка с одним из фиксированных значений
+        rooms: getRandom(1, 3), // число, количество комнат
+        guests: getRandom(1, 10), // число, количество гостей
+        checkin: getRandomElementArr(TIME), // строка с одним из фиксированных значений
+        checkout: getRandomElementArr(TIME), // строка с одним из фиксированных значений
+        features: getRandomElementArr(FEATURES), // !***массив строк случайной длины из FEATURES
+        description: 'какое-то описание', // строка с описанием,
+        photos: ['http://o0.github.io/assets/images/tokyo/hotel1.jpg', 'http://o0.github.io/assets/images/tokyo/hotel2.jpg', 'http://o0.github.io/assets/images/tokyo/hotel3.jpg'],
+      }, // !***массив строк случайной длины, содержащий адреса фотографий
+      location: {
+        x: randomLocation[i].x,
+        y: randomLocation[i].y
+      }
+    };
+    arr.push(element);
+  }
+  console.log(arr);
+  return arr;
+};
 
 
 // Функция создания одного DOM-элемента на основе данных
@@ -117,10 +123,11 @@ var renderFragment = function (arr) {
 };
 
 // 1. Генерация случайных данных
+var offers = renderMockData();
 
 // 4. Вызов функции создания фрагмента и добавление фрагмента в DOM
 var offerList = renderFragment(offers);
-map.querySelector('.map__pins').appendChild(offerList);
+document.querySelector('.map__pins').appendChild(offerList);
 
 // 5. Отображение карты на странице
-map.classList.remove('map--faded');
+document.querySelector('.map').classList.remove('map--faded');
