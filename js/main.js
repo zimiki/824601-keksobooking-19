@@ -1,7 +1,12 @@
 'use strict';
+
 var OFFER_TYPE = ['palace', 'flat', 'house', 'bungalo'];
 var FEATURES = ['wifi', 'dishwasher', 'parking', 'washer', 'elevator', 'conditioner'];
 var TIME = ['12:00', '13:00', '14:00'];
+var PHOTOS = ['http://o0.github.io/assets/images/tokyo/hotel1.jpg', 'http://o0.github.io/assets/images/tokyo/hotel2.jpg', 'http://o0.github.io/assets/images/tokyo/hotel3.jpg'];
+var map = document.querySelector('.map');
+var PIN_WIDTH = 50; // Ширина иконки
+var PIN_HEIGHT = 70; // Высота иконки
 
 
 // Функция генерирующая случайное число в диапазоне
@@ -17,7 +22,7 @@ var getRandomElementArr = function (arr) {
 };
 
 // Функция для перемешивания массива
-var getRandomMixArr = function (arr) {
+var getMixArr = function (arr) {
   for (var i = arr.length - 1; i > 0; i--) {
     var j = Math.floor(Math.random() * (i + 1));
     var swap = arr[i];
@@ -27,68 +32,59 @@ var getRandomMixArr = function (arr) {
   return arr;
 };
 
-
-// a) Массив для свойства location.x  - cлучайное число. Значение ограничено размерами блока, в котором перетаскивается метка
-var randomLocation = [
-  {
-    x: '50',
-    y: '150'
-  },
-  {
-    x: '100',
-    y: '180'
-  },
-  {
-    x: '150',
-    y: '200'
-  },
-  {
-    x: '200',
-    y: '230'
-  },
-  {
-    x: '250',
-    y: '500'
-  },
-  {
-    x: '300',
-    y: '100'
-  },
-  {
-    x: '350',
-    y: '150'
-  },
-  {
-    x: '400',
-    y: '180'
+// Функция для получения из исходного массива, нового массива случаной длины и неповторяющегося содержания
+var getRandomArr = function (arr) {
+  var newArr = [];
+  while (newArr.length < getRandom(1, arr.length)) {
+    var element = arr[getRandom(0, (arr.length - 1))];
+    if (newArr.indexOf(element) === -1) {
+      newArr.push(element);
+    }
   }
-];
+  return newArr;
+};
 
+// Функция генерирующая случайные координаты с учетом пределов отображения метки. У вернехнего левого угла метки пределы x (0, (mapLimits.width-pin.width)) y(130,  630)
+// Значит пределы в которых должна генерироваться координата для острого конца метки: x = + правее на (pin.width/2);  y = + ниже на (pin.height)
+var getRandomLocation = function (n) {
+  var mapLimits = map.querySelector('.map__overlay').getBoundingClientRect();
+  var location = [];
+  for (var i = 0; i < n; i++) {
+    var element = {
+      x: getRandom((PIN_WIDTH / 2), mapLimits.width - (PIN_WIDTH / 2)),
+      y: getRandom(130 + PIN_HEIGHT, 630 + PIN_HEIGHT)
+    };
+    location.push(element);
+  }
+  return location;
+};
+
+// Функция для создания случанйых данных
 var renderMockData = function () {
   var SIMILAR_ELEMENT = 8;
-  // Создание массива для avatar со случайным порядком неповторяющихся значений от 01-08
   var avatarNumber = ['01', '02', '03', '04', '05', '06', '07', '08'];
-  var avatarRandNumber = getRandomMixArr(avatarNumber);
+  var avatarRandNumber = getMixArr(avatarNumber);
+  var randomLocation = getRandomLocation(SIMILAR_ELEMENT);
 
   var arr = [];
   for (var i = 0; i < SIMILAR_ELEMENT; i++) {
     var element = {
       author: {
-        avatar: 'img/avatars/user' + avatarRandNumber[i] + '.png' // строка, адрес изображения вида img/avatars/user{{xx}}.png, где {{xx}} - число от 01 до 08 не повторяются
+        avatar: 'img/avatars/user' + avatarRandNumber[i] + '.png' // строка, вида img/avatars/user{{xx}}.png, где {{xx}} - число от 01 до 08 не повторяются
       },
       offer: {
-        title: 'Заголовок преложения # ' + 1, // строка, заголовок предложения
-        address: randomLocation[i].x + ', ' + randomLocation[i].y, // строка представляет собой запись вида "{{location.x}}, {{location.y}}
+        title: 'Заголовок преложения # ' + (i + 1), // строка, заголовок предложения
+        address: randomLocation[i].x + ', ' + randomLocation[i].y, // строка, запись вида "{{location.x}}, {{location.y}}
         price: '5500', // число, стоимость
         type: getRandomElementArr(OFFER_TYPE), // строка с одним из фиксированных значений
         rooms: getRandom(1, 3), // число, количество комнат
         guests: getRandom(1, 10), // число, количество гостей
         checkin: getRandomElementArr(TIME), // строка с одним из фиксированных значений
         checkout: getRandomElementArr(TIME), // строка с одним из фиксированных значений
-        features: getRandomElementArr(FEATURES), // !***массив строк случайной длины из FEATURES
+        features: getRandomArr(FEATURES), // массив строк случайной
         description: 'какое-то описание', // строка с описанием,
-        photos: ['http://o0.github.io/assets/images/tokyo/hotel1.jpg', 'http://o0.github.io/assets/images/tokyo/hotel2.jpg', 'http://o0.github.io/assets/images/tokyo/hotel3.jpg'],
-      }, // !***массив строк случайной длины, содержащий адреса фотографий
+        photos: getRandomArr(PHOTOS), // массив строк случайной длины
+      },
       location: {
         x: randomLocation[i].x,
         y: randomLocation[i].y
@@ -96,20 +92,19 @@ var renderMockData = function () {
     };
     arr.push(element);
   }
-  console.log(arr);
   return arr;
 };
-
 
 // Функция создания одного DOM-элемента на основе данных
 var renderElement = function (offer) {
   var similarOfferTemplate = document.querySelector('#pin').content.querySelector('.map__pin');
-  var PIN_WIDTH = 50; // Ширина иконки
-  var PIN_HEIGHT = 70; // Высота иконки
-  var iconX = offer.location.x - (PIN_WIDTH / 2); // Поправки для положения иконки - сдвинуть влево на 1/2 ширины
-  var iconY = offer.location.y - PIN_HEIGHT; // Поправки для положения иконки -  сдвинуть вверх на полную высоту
   var offerElement = similarOfferTemplate.cloneNode(true);
+
+  var iconX = offer.location.x - (PIN_WIDTH / 2); // в разметку нужно верхний левый угол, то поправки  = - левее на (pin.width/2)
+  var iconY = offer.location.y - PIN_HEIGHT; // Поправки = - выше на (pin.height)
   offerElement.style = 'left: ' + iconX + 'px; top: ' + iconY + 'px;';
+  offerElement.querySelector('img').src = offer.author.avatar;
+  offerElement.querySelector('img').alt = offer.offer.title;
   return offerElement;
 };
 
@@ -122,12 +117,11 @@ var renderFragment = function (arr) {
   return fragment;
 };
 
+// Алгоритм:
 // 1. Генерация случайных данных
 var offers = renderMockData();
-
-// 4. Вызов функции создания фрагмента и добавление фрагмента в DOM
+// 2. Вызов функции создания фрагмента и добавление фрагмента в DOM
 var offerList = renderFragment(offers);
 document.querySelector('.map__pins').appendChild(offerList);
-
-// 5. Отображение карты на странице
-document.querySelector('.map').classList.remove('map--faded');
+// 3. Отображение карты на странице
+map.classList.remove('map--faded');
