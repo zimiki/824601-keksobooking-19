@@ -116,6 +116,52 @@ var getFragmentWithPins = function (arr) {
   return fragment;
 };
 
+// Функция создающая фрагмент всех фотографий из списка offer.photos. Каждая строка массива  должна записываться как src
+var getFragmentOfferPhotos = function (arr) {
+  var similarPhotoTemplate = document.querySelector('#card').content.querySelector('.popup__photo');
+  var fragment = document.createDocumentFragment();
+  for (var i = 0; i < arr.length; i++) {
+    var photoElement = similarPhotoTemplate.cloneNode(true);
+    photoElement.src = arr[i];
+    fragment.appendChild(photoElement);
+  }
+  return fragment;
+};
+
+// Функция создания одного DOM-элемента на основе данных
+var renderOfferCard = function (offer) {
+  var cardOfferTemplate = document.querySelector('#card').content.querySelector('.map__card');
+  var card = cardOfferTemplate.cloneNode(true);
+  var referenceElement = map.querySelector('.map__filters-container');
+
+  card.querySelector('.popup__title').textContent = offer.offer.title; // заголовок объявления offer.title в заголовок .popup__title.
+  card.querySelector('.popup__text--address').textContent = offer.offer.address; // адрес offer.address в блок .popup__text--address.
+  card.querySelector('.popup__text--price').textContent = offer.offer.price + '₽/ночь'; // цена offer.price в блок .popup__text--price строкой вида
+  card.querySelector('.popup__text--capacity').textContent = offer.offer.rooms + ' комнаты для ' + offer.offer.guests + ' гостей'; // 2 комнаты для 3 гостей.
+  card.querySelector('.popup__text--time').textContent = 'заезд после ' + offer.offer.checkin + ', выезд до ' + offer.offer.checkout; // заезд после 14:00, выезд до 12:00.
+  card.querySelector('.popup__features').textContent = offer.offer.features; // !!!*** в список .popup__features выведите все доступные удобства в объявлении.
+  card.querySelector('.popup__description').textContent = offer.offer.description; // в блок .popup__description выведите описание объекта недвижимости offer.description.
+  card.querySelector('.popup__avatar').src = offer.author.avatar; //  src у аватарки пользователя —  author.avatar отрисовываемого объекта
+
+  //  Квартира для flat, Бунгало для bungalo, Дом для house, Дворец для palace.
+  if (offer.offer.type === 'flat') {
+    card.querySelector('.popup__type').textContent = 'квартира';
+  } else if (offer.offer.type === 'bungalo') {
+    card.querySelector('.popup__type').textContent = 'бунгало';
+  } else if (offer.offer.type === 'house') {
+    card.querySelector('.popup__type').textContent = 'дом';
+  } else if (offer.offer.type === 'palace') {
+    card.querySelector('.popup__type').textContent = 'дворец';
+  }
+
+  card.querySelector('.popup__photos').removeChild(card.querySelector('.popup__photo')); // Удаляет пустой элемент из разметки
+  var fragmentOfferPhotos = getFragmentOfferPhotos(offer.offer.photos); // Вызываем функцию создания фрагмента с фото из массива
+  card.querySelector('.popup__photos').appendChild(fragmentOfferPhotos); // Вставляем в карточку фрагмент с фото
+
+  map.insertBefore(card, referenceElement);
+  return card;
+};
+
 // Алгоритм:
 // 1. Генерация случайных данных
 var offers = getMockData();
@@ -124,3 +170,5 @@ var fragmentWithPins = getFragmentWithPins(offers);
 map.querySelector('.map__pins').appendChild(fragmentWithPins);
 // 3. Отображение карты на странице
 map.classList.remove('map--faded');
+// 4. Отрисовка карточки предложения
+renderOfferCard(offers[0]);
