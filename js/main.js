@@ -6,6 +6,8 @@ var TIMES = ['12:00', '13:00', '14:00'];
 var PHOTOS = ['http://o0.github.io/assets/images/tokyo/hotel1.jpg', 'http://o0.github.io/assets/images/tokyo/hotel2.jpg', 'http://o0.github.io/assets/images/tokyo/hotel3.jpg'];
 var map = document.querySelector('.map');
 var similarOfferTemplate = document.querySelector('#pin').content.querySelector('.map__pin');
+var similarPhotoTemplate = document.querySelector('#card').content.querySelector('.popup__photo');
+var cardOfferTemplate = document.querySelector('#card').content.querySelector('.map__card');
 var PIN_WIDTH = 50; // Ширина иконки
 var PIN_HEIGHT = 70; // Высота иконки
 
@@ -96,7 +98,7 @@ var getMockData = function () {
   return arr;
 };
 
-// Функция создания одного DOM-элемента на основе данных
+// Функция создания одного DOM-элемента на основе данных для PIN
 var renderMapPin = function (offer) {
   var offerElement = similarOfferTemplate.cloneNode(true);
   var iconX = offer.location.x - (PIN_WIDTH / 2); // в разметку нужно верхний левый угол, то поправки  = - левее на (pin.width/2)
@@ -107,39 +109,45 @@ var renderMapPin = function (offer) {
   return offerElement;
 };
 
-// Функция создания фрагмента
-var getFragmentWithPins = function (arr) {
+// Функция создания одного DOM-элемента на основе данных для PHOTO. Каждая строка массива  должна записываться как src
+var renderPhoto = function (photo) {
+  var photoElement = similarPhotoTemplate.cloneNode(true);
+  photoElement.src = photo;
+  return photoElement;
+};
+
+// Функция создания одного DOM-элемента на основе данных для FEATURES. Только доступные
+var renderFeatur = function (featur) {
+  var featurTemplate = document.querySelector('#card').content.querySelector('.popup__feature--' + featur);
+  var featurElement = featurTemplate.cloneNode(true);
+  return featurElement;
+};
+
+// Функция удаления всех дочерних элементов, которые были в шаблоне
+var removeAllChildElement = function (parent) {
+  while (parent.firstChild) {
+    parent.removeChild(parent.firstChild);
+  }
+};
+
+// Функция создания фрагмента, принимает массив данных и функцию отрисовки элемента
+var getFragment = function (arr, renderElement) {
   var fragment = document.createDocumentFragment();
   for (var i = 0; i < arr.length; i++) {
-    fragment.appendChild(renderMapPin(arr[i]));
+    fragment.appendChild(renderElement(arr[i]));
   }
   return fragment;
 };
 
-// Функция создающая фрагмент всех фотографий из списка offer.photos. Каждая строка массива  должна записываться как src
-var getFragmentOfferPhotos = function (arr) {
-  var similarPhotoTemplate = document.querySelector('#card').content.querySelector('.popup__photo');
-  var fragment = document.createDocumentFragment();
-  for (var i = 0; i < arr.length; i++) {
-    var photoElement = similarPhotoTemplate.cloneNode(true);
-    photoElement.src = arr[i];
-    fragment.appendChild(photoElement);
-  }
-  return fragment;
-};
-
-// Функция создания одного DOM-элемента на основе данных
+// Функция создания одного DOM-элемента CARD на основе данных
 var renderOfferCard = function (offer) {
-  var cardOfferTemplate = document.querySelector('#card').content.querySelector('.map__card');
   var card = cardOfferTemplate.cloneNode(true);
-  var referenceElement = map.querySelector('.map__filters-container');
 
   card.querySelector('.popup__title').textContent = offer.offer.title; // заголовок объявления offer.title в заголовок .popup__title.
   card.querySelector('.popup__text--address').textContent = offer.offer.address; // адрес offer.address в блок .popup__text--address.
   card.querySelector('.popup__text--price').textContent = offer.offer.price + '₽/ночь'; // цена offer.price в блок .popup__text--price строкой вида
   card.querySelector('.popup__text--capacity').textContent = offer.offer.rooms + ' комнаты для ' + offer.offer.guests + ' гостей'; // 2 комнаты для 3 гостей.
   card.querySelector('.popup__text--time').textContent = 'заезд после ' + offer.offer.checkin + ', выезд до ' + offer.offer.checkout; // заезд после 14:00, выезд до 12:00.
-  card.querySelector('.popup__features').textContent = offer.offer.features; // !!!*** в список .popup__features выведите все доступные удобства в объявлении.
   card.querySelector('.popup__description').textContent = offer.offer.description; // в блок .popup__description выведите описание объекта недвижимости offer.description.
   card.querySelector('.popup__avatar').src = offer.author.avatar; //  src у аватарки пользователя —  author.avatar отрисовываемого объекта
 
@@ -154,11 +162,21 @@ var renderOfferCard = function (offer) {
     card.querySelector('.popup__type').textContent = 'дворец';
   }
 
-  card.querySelector('.popup__photos').removeChild(card.querySelector('.popup__photo')); // Удаляет пустой элемент из разметки
-  var fragmentOfferPhotos = getFragmentOfferPhotos(offer.offer.photos); // Вызываем функцию создания фрагмента с фото из массива
-  card.querySelector('.popup__photos').appendChild(fragmentOfferPhotos); // Вставляем в карточку фрагмент с фото
+  // В блок .popup__photos выводим все фотографии из списка offer.photos
+  var photos = card.querySelector('.popup__photos');
+  removeAllChildElement(photos);// Удаляет пустой элемент из разметки
+  var fragmentOfferPhotos = getFragment(offer.offer.photos, renderPhoto); // Вызываем функцию создания фрагмента с фото из массива
+  photos.appendChild(fragmentOfferPhotos); // Вставляем  фрагмент с фотографиями
 
-  map.insertBefore(card, referenceElement);
+  // В список .popup__features вывлдим все доступные удобства в объявлении
+  var features = card.querySelector('.popup__features');
+  removeAllChildElement(features);// Удаляет пустой элемент из разметки
+  var fragmentOfferFeatures = getFragment(offer.offer.features, renderFeatur);// Вызываем функцию создания фрагмента с преимущества из массива
+  features.appendChild(fragmentOfferFeatures); // Вставляем  фрагмент с преимуществами
+
+
+  var referenceElement = map.querySelector('.map__filters-container');
+  map.insertBefore(card, referenceElement); // Вставка CARD в блок .map перед блоком.map__filters-container
   return card;
 };
 
@@ -166,7 +184,7 @@ var renderOfferCard = function (offer) {
 // 1. Генерация случайных данных
 var offers = getMockData();
 // 2. Вызов функции создания фрагмента и добавление фрагмента в DOM
-var fragmentWithPins = getFragmentWithPins(offers);
+var fragmentWithPins = getFragment(offers, renderMapPin);
 map.querySelector('.map__pins').appendChild(fragmentWithPins);
 // 3. Отображение карты на странице
 map.classList.remove('map--faded');
