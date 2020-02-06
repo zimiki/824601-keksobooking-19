@@ -139,10 +139,25 @@ var getFragment = function (arr, renderElement) {
   return fragment;
 };
 
+
+// Функция получения текстового значения. Квартира для flat, Бунгало для bungalo, Дом для house, Дворец для palace.
+var getTypeText = function (type) {
+  var typeOffer = 'не указано';
+  if (type === 'flat') {
+    typeOffer = 'квартира';
+  } else if (type === 'bungalo') {
+    typeOffer = 'бунгало';
+  } else if (type === 'house') {
+    typeOffer = 'дом';
+  } else if (type === 'palace') {
+    typeOffer = 'дворец';
+  }
+  return typeOffer;
+};
+
 // Функция создания одного DOM-элемента CARD на основе данных
 var renderOfferCard = function (offer) {
   var card = cardOfferTemplate.cloneNode(true);
-
   card.querySelector('.popup__title').textContent = offer.offer.title; // заголовок объявления offer.title в заголовок .popup__title.
   card.querySelector('.popup__text--address').textContent = offer.offer.address; // адрес offer.address в блок .popup__text--address.
   card.querySelector('.popup__text--price').textContent = offer.offer.price + '₽/ночь'; // цена offer.price в блок .popup__text--price строкой вида
@@ -150,17 +165,7 @@ var renderOfferCard = function (offer) {
   card.querySelector('.popup__text--time').textContent = 'заезд после ' + offer.offer.checkin + ', выезд до ' + offer.offer.checkout; // заезд после 14:00, выезд до 12:00.
   card.querySelector('.popup__description').textContent = offer.offer.description; // в блок .popup__description выведите описание объекта недвижимости offer.description.
   card.querySelector('.popup__avatar').src = offer.author.avatar; //  src у аватарки пользователя —  author.avatar отрисовываемого объекта
-
-  //  Квартира для flat, Бунгало для bungalo, Дом для house, Дворец для palace.
-  if (offer.offer.type === 'flat') {
-    card.querySelector('.popup__type').textContent = 'квартира';
-  } else if (offer.offer.type === 'bungalo') {
-    card.querySelector('.popup__type').textContent = 'бунгало';
-  } else if (offer.offer.type === 'house') {
-    card.querySelector('.popup__type').textContent = 'дом';
-  } else if (offer.offer.type === 'palace') {
-    card.querySelector('.popup__type').textContent = 'дворец';
-  }
+  card.querySelector('.popup__type').textContent = getTypeText(offer.offer.type);
 
   // В блок .popup__photos выводим все фотографии из списка offer.photos
   var photos = card.querySelector('.popup__photos');
