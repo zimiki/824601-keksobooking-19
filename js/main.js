@@ -6,10 +6,12 @@ var TIMES = ['12:00', '13:00', '14:00'];
 var PHOTOS = ['http://o0.github.io/assets/images/tokyo/hotel1.jpg', 'http://o0.github.io/assets/images/tokyo/hotel2.jpg', 'http://o0.github.io/assets/images/tokyo/hotel3.jpg'];
 var map = document.querySelector('.map');
 var similarOfferTemplate = document.querySelector('#pin').content.querySelector('.map__pin');
-var similarPhotoTemplate = document.querySelector('#card').content.querySelector('.popup__photo');
-var cardOfferTemplate = document.querySelector('#card').content.querySelector('.map__card');
+// var similarPhotoTemplate = document.querySelector('#card').content.querySelector('.popup__photo');
+// var cardOfferTemplate = document.querySelector('#card').content.querySelector('.map__card');
 var PIN_WIDTH = 50; // Ширина иконки
 var PIN_HEIGHT = 70; // Высота иконки
+var ESC_KEY = 'Escape';
+var ENTER_KEY = 'Enter';
 
 
 // Функция генерирующая случайное число в диапазоне
@@ -109,12 +111,14 @@ var renderMapPin = function (offer) {
   return offerElement;
 };
 
+/*
 // Функция создания одного DOM-элемента на основе данных для PHOTO. Каждая строка массива  должна записываться как src
 var renderPhoto = function (photo) {
   var photoElement = similarPhotoTemplate.cloneNode(true);
   photoElement.src = photo;
   return photoElement;
 };
+
 
 // Функция создания одного DOM-элемента на основе данных для FEATURES. Только доступные
 var renderFeatur = function (featur) {
@@ -123,12 +127,15 @@ var renderFeatur = function (featur) {
   return featurElement;
 };
 
+
 // Функция удаления всех дочерних элементов, которые были в шаблоне
 var removeAllChildElement = function (parent) {
   while (parent.firstChild) {
     parent.removeChild(parent.firstChild);
   }
 };
+*/
+
 
 // Функция создания фрагмента, принимает массив данных и функцию отрисовки элемента
 var getFragment = function (arr, renderElement) {
@@ -140,6 +147,7 @@ var getFragment = function (arr, renderElement) {
 };
 
 
+/*
 // Функция получения текстового значения. Квартира для flat, Бунгало для bungalo, Дом для house, Дворец для palace.
 var getTypeText = function (type) {
   var typeOffer = 'не указано';
@@ -156,7 +164,7 @@ var getTypeText = function (type) {
 };
 
 // Функция создания одного DOM-элемента CARD на основе данных
-var renderOfferCard = function (offer) {
+  var renderOfferCard = function (offer) {
   var card = cardOfferTemplate.cloneNode(true);
   card.querySelector('.popup__title').textContent = offer.offer.title; // заголовок объявления offer.title в заголовок .popup__title.
   card.querySelector('.popup__text--address').textContent = offer.offer.address; // адрес offer.address в блок .popup__text--address.
@@ -185,13 +193,127 @@ var renderOfferCard = function (offer) {
   return card;
 };
 
-// Алгоритм:
-// 1. Генерация случайных данных
-var offers = getMockData();
-// 2. Вызов функции создания фрагмента и добавление фрагмента в DOM
-var fragmentWithPins = getFragment(offers, renderMapPin);
-map.querySelector('.map__pins').appendChild(fragmentWithPins);
-// 3. Отображение карты на странице
-map.classList.remove('map--faded');
-// 4. Отрисовка карточки предложения
+4. Отрисовка карточки предложения
 renderOfferCard(offers[0]);
+*/
+
+
+// Генерация случайных данных
+var offers = getMockData();
+
+
+// ----------  О Б Р А Б О Т К А     С О Б Ы Т И Й   -----------
+
+
+var mainPin = map.querySelector('.map__pin--main'); // Элемент активирующий карту
+var mapFilter = map.querySelector('.map__filters'); // Форма №1 .map__filters
+var adForm = document.querySelector('.ad-form'); // Форма №2 .ad-form
+var resetFormButton = adForm.querySelector('.ad-form__reset'); // Элемент сбрасывающий карту до изначального неативного состояния
+var mapPins = map.querySelector('.map__pins');
+
+// Функция, которая УСТАНАВЛИВАЕТ неактивное состояние на <input> и <select> формы с помощью атрибута disabled
+var getInactiveForm = function (form) {
+  var allInput = form.querySelectorAll('input');
+  var allSelect = form.querySelectorAll('select');
+  for (var i = 0; i < allInput.length; i++) {
+    allInput[i].setAttribute('disabled', 'disabled');
+  }
+  for (var j = 0; j < allSelect.length; j++) {
+    allSelect[j].setAttribute('disabled', 'disabled');
+  }
+};
+
+// Функция, которая СНИМАЕТ неактивное состояние на <input> и <select>
+var getActiveForm = function (form) {
+  var allInput = form.querySelectorAll('input');
+  var allSelect = form.querySelectorAll('select');
+  for (var i = 0; i < allInput.length; i++) {
+    allInput[i].removeAttribute('disabled');
+  }
+  for (var j = 0; j < allSelect.length; j++) {
+    allSelect[j].removeAttribute('disabled');
+  }
+};
+
+// ???? ВОПРОС ???????   Функция, которая отвечает за связку двух селекторов
+var selectRoomNumber = adForm.querySelector('#room_number');
+var validityCapacity = function () {
+  var valueRoomNumber = selectRoomNumber.options[selectRoomNumber.selectedIndex].value; // Определим, какое значение выбрано
+  console.log(valueRoomNumber);
+  if (valueRoomNumber === 1) {
+    console.log('ОДИН'); // ???ВОПРОС ???   Почему не работает
+  }
+};
+
+
+var openMap = function () {
+  map.classList.remove('map--faded'); // Снимает неактивное состояние .map содержит класс map--faded;
+  adForm.classList.remove('ad-form--disabled');
+  getActiveForm(mapFilter); // Снимает неактивное состояние c формы №1
+  getActiveForm(adForm); // Снимает неактивное состояние c формы №2
+  var fragmentWithPins = getFragment(offers, renderMapPin); // Вызов функции создания фрагмента c pin объявлений
+  map.querySelector('.map__pins').appendChild(fragmentWithPins); // Добавление фрагмента c pin в DOM
+  resetFormButton.addEventListener('click', closeMap); // Обработчик для перехода к начальному состоянию
+  selectRoomNumber.addEventListener('change', validityCapacity); // Обработчик события измения
+};
+
+// Функция, которая удаляет все вставленные фрагметом метки объявлений
+var removeNewMapPins = function () {
+  var newMapPins = mapPins.querySelectorAll('.map__pin'); //    ??? ВОПРОС???? !!!!! Как только я заворачиваю это в for (var i = newMapPins; i > 0; --i) перестает работать
+  mapPins.removeChild(newMapPins[8]);
+  mapPins.removeChild(newMapPins[7]);
+  mapPins.removeChild(newMapPins[6]);
+  mapPins.removeChild(newMapPins[5]);
+  mapPins.removeChild(newMapPins[4]);
+  mapPins.removeChild(newMapPins[3]);
+  mapPins.removeChild(newMapPins[2]);
+  mapPins.removeChild(newMapPins[1]);
+};
+
+var closeMap = function () {
+  map.classList.add('map--faded'); // Снимает неактивное состояние .map содержит класс map--faded;
+  adForm.classList.add('ad-form--disabled');
+  getInactiveForm(mapFilter); // Заблокирована форма №1 .map__filters
+  getInactiveForm(adForm); // Заблокирована форма №2 .ad-form
+  removeNewMapPins();
+  resetFormButton.removeEventListener('click', closeMap);
+  selectRoomNumber.removeEventListener('change', validityCapacity);
+};
+
+// Функция, которыя устанавливает значения поля ввода адреса. Это координаты, на которые метка указывает своим острым концом.
+var getСoordinatesAddress = function (evt) {
+  var mapCoord = map.getBoundingClientRect(); // получим координаты карты. X/Y-координаты начала прямоугольника относительно окна
+  var pinX = Math.floor(evt.clientX - mapCoord.x); // получим координаты мышки относительно окна карты (это пин)
+  var pinY = Math.floor(evt.clientY - mapCoord.y);
+
+  var addressX = pinX + (PIN_WIDTH / 2); // получим координаты для остного конца метки(правее +(ширины/2), ниже +высоты)
+  var addressY = pinY + PIN_HEIGHT;
+
+  var inputAddress = adForm.querySelector('#address'); // найдем интуп для адреса, запишем координаты
+  inputAddress.value = addressX + ' ,' + addressY;
+};
+
+var getInfoMousedown = function (evt) {
+  if (typeof evt === 'object') {
+    switch (evt.button) { // Проверка на то что клик приходит с левой кнопки мыши
+      case 0:
+        openMap();
+        getСoordinatesAddress(evt);
+    }
+  }
+};
+
+// Приводит страницу в изначальное неактивное состояние
+getInactiveForm(mapFilter); // Заблокирована форма №1 .map__filters
+getInactiveForm(adForm); // Заблокирована форма №2 .ad-form
+
+// Добавялет обработчик АКТИВАЦИИ на mousedown
+mainPin.addEventListener('mousedown', getInfoMousedown);
+
+// Добавялет обработчик АКТИВАЦИИ на keydown с проверкой на то что это кнопка Enter
+mainPin.addEventListener('keydown', function (evt) {
+  if (evt.key === ENTER_KEY) {
+    openMap();
+  }
+});
+
