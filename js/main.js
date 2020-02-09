@@ -10,7 +10,6 @@ var similarOfferTemplate = document.querySelector('#pin').content.querySelector(
 // var cardOfferTemplate = document.querySelector('#card').content.querySelector('.map__card');
 var PIN_WIDTH = 50; // Ширина иконки
 var PIN_HEIGHT = 70; // Высота иконки
-var ESC_KEY = 'Escape';
 var ENTER_KEY = 'Enter';
 
 
@@ -239,9 +238,9 @@ var getActiveForm = function (form) {
 var selectRoomNumber = adForm.querySelector('#room_number');
 var validityCapacity = function () {
   var valueRoomNumber = selectRoomNumber.options[selectRoomNumber.selectedIndex].value; // Определим, какое значение выбрано
-  console.log(valueRoomNumber);
-  if (valueRoomNumber === 1) {
-    console.log('ОДИН'); // ???ВОПРОС ???   Почему не работает
+  // console.log(valueRoomNumber);
+  if (valueRoomNumber === 1) { // ???ВОПРОС ???   Почему не работает
+  // console.log('ОДИН');
   }
 };
 
