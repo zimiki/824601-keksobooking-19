@@ -10,7 +10,10 @@ var similarOfferTemplate = document.querySelector('#pin').content.querySelector(
 // var cardOfferTemplate = document.querySelector('#card').content.querySelector('.map__card');
 var PIN_WIDTH = 50; // Ширина иконки
 var PIN_HEIGHT = 70; // Высота иконки
+var MAIN_PIN_WIDTH = 65; // Ширина главной метки
+var MAIN_PIN_HEIGHT = 84; // Высота главной метки
 var ENTER_KEY = 'Enter';
+var LEFT_MOUSE_BUTTON = 0;
 
 
 // Функция генерирующая случайное число в диапазоне
@@ -208,16 +211,27 @@ var mainPin = map.querySelector('.map__pin--main'); // Элемент актив
 var mapFilter = map.querySelector('.map__filters'); // Форма №1 .map__filters
 var adForm = document.querySelector('.ad-form'); // Форма №2 .ad-form
 var resetFormButton = adForm.querySelector('.ad-form__reset'); // Элемент сбрасывающий карту до изначального неативного состояния
-var mapPins = map.querySelector('.map__pins');
+var mapPins = map.querySelector('.map__pins'); // Главная метка
 var typeSelect = adForm.querySelector('#type');
 var priceInput = adForm.querySelector('#price');
 var roomSelect = adForm.querySelector('#room_number');
 var capacitySelect = adForm.querySelector('#capacity');
 var adFormTime = adForm.querySelector('.ad-form__element--time');
+var inputAddress = adForm.querySelector('#address');
+
+
+// Функция, которая устанавливает в неактивном состоянии страницы  адрес = координаты центра метки;
+var setInactiveAdress = function () {
+  var mainPinX = parseInt(mainPin.style.left, 10);
+  var mainPinY = parseInt(mainPin.style.top, 10);
+  var centerX = Math.floor(mainPinX + (MAIN_PIN_WIDTH / 2));
+  var centerY = Math.floor(mainPinY + (MAIN_PIN_WIDTH / 2)); // не использую высоту, потому что метка круглая без хвостика
+  inputAddress.value = (centerX + ', ' + centerY);
+};
 
 
 // Функция, которая УСТАНАВЛИВАЕТ неактивное состояние на <input> и <select> формы с помощью атрибута disabled
-var getInactiveForm = function (form) {
+var inactiveForm = function (form) {
   var allInput = form.querySelectorAll('input');
   var allSelect = form.querySelectorAll('select');
   for (var i = 0; i < allInput.length; i++) {
@@ -229,7 +243,7 @@ var getInactiveForm = function (form) {
 };
 
 // Функция, которая СНИМАЕТ неактивное состояние на <input> и <select>
-var getActiveForm = function (form) {
+var activeForm = function (form) {
   var allInput = form.querySelectorAll('input');
   var allSelect = form.querySelectorAll('select');
   for (var i = 0; i < allInput.length; i++) {
@@ -266,7 +280,7 @@ var onPriceInputChange = function () {
 };
 
 // Обработчик изменения селекта time
-var getMinPrice = function () {
+var setMinPrice = function () {
   var type = typeSelect.value;
   var minPrice = 0;
   if (type === 'bungalo') {
@@ -284,7 +298,7 @@ var getMinPrice = function () {
 };
 
 var onTypeSelectChange = function () {
-  getMinPrice();
+  setMinPrice();
   onPriceInputChange();
 };
 
@@ -317,27 +331,43 @@ var onTimeSelectCange = function (evt) {
   }
 };
 
+// Функция, которая учитывает поправки на передачу координат ГЛАВНОЙ метки  (левого вехнего угла--> острого конца)
+var getMainPinMarkCoord = function (pinX, pinY) {
+  var markX = Math.floor(pinX + (MAIN_PIN_WIDTH / 2)); // получим координаты для остного конца метки(правее +(ширины/2), ниже +высоты)
+  var markY = Math.floor(pinY + MAIN_PIN_HEIGHT);
+  var markCoord = {
+    x: markX,
+    y: markY
+  };
+  return (markCoord);
+};
+
 // Функция, которыя устанавливает значения поля ввода адреса. Это координаты, на которые метка указывает своим острым концом.
-var getСoordinatesAddress = function (evt) {
+var getMouseСoordAddress = function (evt) {
   var mapCoord = map.getBoundingClientRect(); // получим координаты карты. X/Y-координаты начала прямоугольника относительно окна
-  var pinX = Math.floor(evt.clientX - mapCoord.x); // получим координаты мышки относительно окна карты (это пин)
-  var pinY = Math.floor(evt.clientY - mapCoord.y);
+  var mainPinX = Math.floor(evt.clientX - mapCoord.x); // получим координаты мышки относительно окна карты (это пин)
+  var mainPinY = Math.floor(evt.clientY - mapCoord.y);
+  var pinMarkCoord = getMainPinMarkCoord(mainPinX, mainPinY); // внесем поправки для передачи координат
+  inputAddress.value = pinMarkCoord.x + ', ' + pinMarkCoord.y; // в интуп для адреса, запишем координаты
+};
 
-  var addressX = pinX + (PIN_WIDTH / 2); // получим координаты для остного конца метки(правее +(ширины/2), ниже +высоты)
-  var addressY = pinY + PIN_HEIGHT;
-
-  var inputAddress = adForm.querySelector('#address'); // найдем интуп для адреса, запишем координаты
-  inputAddress.value = addressX + ' ,' + addressY;
+// Функция, которыя устанавливает значения поля ввода адреса. Вариация для Enter
+var getKeyСoordinatesAddress = function (evt) {
+  var mainPinX = evt.target.offsetLeft;
+  var mainPinY = evt.target.offsetTop;
+  var pinMarkCoord = getMainPinMarkCoord(mainPinX, mainPinY); // внесем поправки для передачи координат
+  inputAddress.value = pinMarkCoord.x + ', ' + pinMarkCoord.y; // в интуп для адреса, запишем координаты
 };
 
 var openMap = function () {
   map.classList.remove('map--faded'); // Снимает неактивное состояние .map содержит класс map--faded;
   adForm.classList.remove('ad-form--disabled');
-  getActiveForm(mapFilter); // Снимает неактивное состояние c формы №1
-  getActiveForm(adForm); // Снимает неактивное состояние c формы №2
+  activeForm(mapFilter); // Снимает неактивное состояние c формы №1
+  activeForm(adForm); // Снимает неактивное состояние c формы №2
   var fragmentWithPins = getFragment(offers, renderMapPin); // Вызов функции создания фрагмента c pin объявлений
   map.querySelector('.map__pins').appendChild(fragmentWithPins); // Добавление фрагмента c pin в DOM
-  getMinPrice(); // Установим минимум для выбраного селекта из разметки
+  setMinPrice(); // Установим минимум для выбраного селекта из разметки
+  inputAddress.setAttribute('disabled', 'disabled'); // Заблокируем поля ввода адреса
   // Добавление обработчиков:
   typeSelect.addEventListener('change', onTypeSelectChange); // Проверка изменений по типу жилья
   priceInput.addEventListener('change', onPriceInputChange); // Проверка изменений цены жилья
@@ -350,8 +380,9 @@ var openMap = function () {
 var closeMap = function () {
   map.classList.add('map--faded');
   adForm.classList.add('ad-form--disabled');
-  getInactiveForm(mapFilter); // Заблокирована форма №1 .map__filters
-  getInactiveForm(adForm); // Заблокирована форма №2 .ad-form
+  inactiveForm(mapFilter);
+  inactiveForm(adForm);
+  setInactiveAdress(); // ???? !!!! ВОПРОС ПОЧЕМУ ТУТ НЕ СРАБАТЫВАЕТ?
   removeNewMapPins();
   // Снятие обработчиков:
   typeSelect.removeEventListener('change', onTypeSelectChange);
@@ -362,28 +393,32 @@ var closeMap = function () {
   resetFormButton.removeEventListener('click', closeMap);
 };
 
-var mainPinLeftClikHandler = function (evt) {
+var onMainPinClik = function (evt) {
   if (typeof evt === 'object') {
     switch (evt.button) { // Проверка на то что клик приходит с левой кнопки мыши
-      case 0:
+      case LEFT_MOUSE_BUTTON:
         openMap();
-        getСoordinatesAddress(evt);
+        getMouseСoordAddress(evt);
     }
+  }
+};
+
+var onMainPinKeydown = function (evt) {
+  if (evt.key === ENTER_KEY) {
+    openMap();
+    getKeyСoordinatesAddress(evt);
   }
 };
 
 // Запускаем код:
 // Приводит страницу в изначальное неактивное состояние
-getInactiveForm(mapFilter); // Заблокирована форма №1 .map__filters
-getInactiveForm(adForm); // Заблокирована форма №2 .ad-form
+inactiveForm(mapFilter); // Заблокирована форма №1 .map__filters
+inactiveForm(adForm); // Заблокирована форма №2 .ad-form
+setInactiveAdress(); // Устанавливаем адрес = центру метки
 
 // Добавялет обработчик АКТИВАЦИИ на mousedown
-mainPin.addEventListener('mousedown', mainPinLeftClikHandler);
+mainPin.addEventListener('mousedown', onMainPinClik);
 
 // Добавялет обработчик АКТИВАЦИИ на keydown с проверкой на то что это кнопка Enter
-mainPin.addEventListener('keydown', function (evt) {
-  if (evt.key === ENTER_KEY) {
-    openMap();
-  }
-});
+mainPin.addEventListener('keydown', onMainPinKeydown);
 
