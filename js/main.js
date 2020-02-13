@@ -211,6 +211,8 @@ var resetFormButton = adForm.querySelector('.ad-form__reset'); // Элемент
 var mapPins = map.querySelector('.map__pins');
 var roomSelect = adForm.querySelector('#room_number');
 var capacitySelect = adForm.querySelector('#capacity');
+var adFormTime = adForm.querySelector('.ad-form__element--time');
+
 
 // Функция, которая УСТАНАВЛИВАЕТ неактивное состояние на <input> и <select> формы с помощью атрибута disabled
 var getInactiveForm = function (form) {
@@ -237,7 +239,7 @@ var getActiveForm = function (form) {
 };
 
 // Валидация input room-capasity
-var validateCapacity = function () {
+var roomCapacitySelectChangeHandler = function () {
   var rooms = parseInt(roomSelect.value, 10);
   var capacity = parseInt(capacitySelect.value, 10);
   if (rooms === 1 && capacity !== 1) {
@@ -253,17 +255,16 @@ var validateCapacity = function () {
   }
 };
 
-var openMap = function () {
-  map.classList.remove('map--faded'); // Снимает неактивное состояние .map содержит класс map--faded;
-  adForm.classList.remove('ad-form--disabled');
-  getActiveForm(mapFilter); // Снимает неактивное состояние c формы №1
-  getActiveForm(adForm); // Снимает неактивное состояние c формы №2
-  var fragmentWithPins = getFragment(offers, renderMapPin); // Вызов функции создания фрагмента c pin объявлений
-  map.querySelector('.map__pins').appendChild(fragmentWithPins); // Добавление фрагмента c pin в DOM
-  // Добавление обработчиков:
-  roomSelect.addEventListener('change', validateCapacity); // Валидация значений при смене количества комнат
-  capacitySelect.addEventListener('change', validateCapacity); // Валидация значений при смене количества гостей
-  resetFormButton.addEventListener('click', closeMap); // Обработчик для перехода к начальному состоянию
+
+// Функция, которая синхронизирует поля «Время заезда» и «Время выезда»
+var adFormTimeCangeHandler = function (evt) {
+  var timeinSelect = adForm.querySelector('#timein');
+  var timeoutSelect = adForm.querySelector('#timeout');
+  if (evt.target === timeinSelect) {
+    timeoutSelect.value = timeinSelect.value;
+  } else if (evt.target === timeoutSelect) {
+    timeinSelect .value = timeoutSelect.value;
+  }
 };
 
 // Функция, которая удаляет все вставленные фрагметом метки объявлений
@@ -274,18 +275,6 @@ var removeNewMapPins = function () {
       mapPins.removeChild(newMapPins[i]);
     }
   }
-};
-
-var closeMap = function () {
-  map.classList.add('map--faded'); // Снимает неактивное состояние .map содержит класс map--faded;
-  adForm.classList.add('ad-form--disabled');
-  getInactiveForm(mapFilter); // Заблокирована форма №1 .map__filters
-  getInactiveForm(adForm); // Заблокирована форма №2 .ad-form
-  removeNewMapPins();
-  // Снятие обработчиков:
-  roomSelect.removeEventListener('change', validateCapacity);
-  capacitySelect.removeEventListener('change', validateCapacity);
-  resetFormButton.removeEventListener('click', closeMap);
 };
 
 // Функция, которыя устанавливает значения поля ввода адреса. Это координаты, на которые метка указывает своим острым концом.
@@ -299,6 +288,33 @@ var getСoordinatesAddress = function (evt) {
 
   var inputAddress = adForm.querySelector('#address'); // найдем интуп для адреса, запишем координаты
   inputAddress.value = addressX + ' ,' + addressY;
+};
+
+var openMap = function () {
+  map.classList.remove('map--faded'); // Снимает неактивное состояние .map содержит класс map--faded;
+  adForm.classList.remove('ad-form--disabled');
+  getActiveForm(mapFilter); // Снимает неактивное состояние c формы №1
+  getActiveForm(adForm); // Снимает неактивное состояние c формы №2
+  var fragmentWithPins = getFragment(offers, renderMapPin); // Вызов функции создания фрагмента c pin объявлений
+  map.querySelector('.map__pins').appendChild(fragmentWithPins); // Добавление фрагмента c pin в DOM
+  // Добавление обработчиков:
+  adFormTime.addEventListener('change', adFormTimeCangeHandler); // Синхронизация времени
+  roomSelect.addEventListener('change', roomCapacitySelectChangeHandler); // Валидация значений при смене количества комнат
+  capacitySelect.addEventListener('change', roomCapacitySelectChangeHandler); // Валидация значений при смене количества комнат
+  resetFormButton.addEventListener('click', closeMap); // Обработчик для перехода к начальному состоянию
+};
+
+var closeMap = function () {
+  map.classList.add('map--faded');
+  adForm.classList.add('ad-form--disabled');
+  getInactiveForm(mapFilter); // Заблокирована форма №1 .map__filters
+  getInactiveForm(adForm); // Заблокирована форма №2 .ad-form
+  removeNewMapPins();
+  // Снятие обработчиков:
+  adFormTime.removeEventListener('change', adFormTimeCangeHandler);
+  roomSelect.removeEventListener('change', roomCapacitySelectChangeHandler);
+  capacitySelect.removeEventListener('change', roomCapacitySelectChangeHandler);
+  resetFormButton.removeEventListener('click', closeMap);
 };
 
 var mainPinLeftClikHandler = function (evt) {
