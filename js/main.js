@@ -209,6 +209,8 @@ var mapFilter = map.querySelector('.map__filters'); // Форма №1 .map__fil
 var adForm = document.querySelector('.ad-form'); // Форма №2 .ad-form
 var resetFormButton = adForm.querySelector('.ad-form__reset'); // Элемент сбрасывающий карту до изначального неативного состояния
 var mapPins = map.querySelector('.map__pins');
+var typeSelect = adForm.querySelector('#type');
+var priceInput = adForm.querySelector('#price');
 var roomSelect = adForm.querySelector('#room_number');
 var capacitySelect = adForm.querySelector('#capacity');
 var adFormTime = adForm.querySelector('.ad-form__element--time');
@@ -238,8 +240,57 @@ var getActiveForm = function (form) {
   }
 };
 
-// Валидация input room-capasity
-var roomCapacitySelectChangeHandler = function () {
+// Функция, которая удаляет все вставленные фрагметом метки объявлений
+var removeNewMapPins = function () {
+  var newMapPins = mapPins.querySelectorAll('.map__pin');
+  for (var i = 0; i < newMapPins.length; i++) {
+    if (!newMapPins[i].classList.contains('map__pin--main')) {
+      mapPins.removeChild(newMapPins[i]);
+    }
+  }
+};
+
+// Обработчик изменения priceInput
+var onPriceInputChange = function () {
+  var min = parseInt(priceInput.min, 10);
+  var max = parseInt(priceInput.max, 10);
+  if (priceInput.value < min) {
+    priceInput.setCustomValidity('Минимальное значение - ' + min);
+  } else if (priceInput.value > max) {
+    priceInput.setCustomValidity('Максимальное значение - ' + max);
+  } else if (priceInput.validity.valueMissing) {
+    priceInput.setCustomValidity('Обязательное поле');
+  } else {
+    priceInput.setCustomValidity('');
+  }
+};
+
+// Обработчик изменения селекта time
+var getMinPrice = function () {
+  var type = typeSelect.value;
+  var minPrice = 0;
+  if (type === 'bungalo') {
+    minPrice = 0;
+  } else if (type === 'flat') {
+    minPrice = 1000;
+
+  } else if (type === 'house') {
+    minPrice = 5000;
+  } else {
+    minPrice = 10000;
+  }
+  priceInput.min = minPrice;
+  priceInput.placeholder = minPrice;
+};
+
+var onTypeSelectChange = function () {
+  getMinPrice();
+  onPriceInputChange();
+};
+
+
+// Обработчик изменения селекта room
+var onRoomSelectChange = function () {
   var rooms = parseInt(roomSelect.value, 10);
   var capacity = parseInt(capacitySelect.value, 10);
   if (rooms === 1 && capacity !== 1) {
@@ -255,25 +306,14 @@ var roomCapacitySelectChangeHandler = function () {
   }
 };
 
-
-// Функция, которая синхронизирует поля «Время заезда» и «Время выезда»
-var adFormTimeCangeHandler = function (evt) {
+// Обработчик синхронизирует поля «Время заезда» и «Время выезда»
+var onTimeSelectCange = function (evt) {
   var timeinSelect = adForm.querySelector('#timein');
   var timeoutSelect = adForm.querySelector('#timeout');
   if (evt.target === timeinSelect) {
     timeoutSelect.value = timeinSelect.value;
   } else if (evt.target === timeoutSelect) {
     timeinSelect .value = timeoutSelect.value;
-  }
-};
-
-// Функция, которая удаляет все вставленные фрагметом метки объявлений
-var removeNewMapPins = function () {
-  var newMapPins = mapPins.querySelectorAll('.map__pin');
-  for (var i = 0; i < newMapPins.length; i++) {
-    if (!newMapPins[i].classList.contains('map__pin--main')) {
-      mapPins.removeChild(newMapPins[i]);
-    }
   }
 };
 
@@ -297,10 +337,13 @@ var openMap = function () {
   getActiveForm(adForm); // Снимает неактивное состояние c формы №2
   var fragmentWithPins = getFragment(offers, renderMapPin); // Вызов функции создания фрагмента c pin объявлений
   map.querySelector('.map__pins').appendChild(fragmentWithPins); // Добавление фрагмента c pin в DOM
+  getMinPrice(); // Установим минимум для выбраного селекта из разметки
   // Добавление обработчиков:
-  adFormTime.addEventListener('change', adFormTimeCangeHandler); // Синхронизация времени
-  roomSelect.addEventListener('change', roomCapacitySelectChangeHandler); // Валидация значений при смене количества комнат
-  capacitySelect.addEventListener('change', roomCapacitySelectChangeHandler); // Валидация значений при смене количества комнат
+  typeSelect.addEventListener('change', onTypeSelectChange); // Проверка изменений по типу жилья
+  priceInput.addEventListener('change', onPriceInputChange); // Проверка изменений цены жилья
+  adFormTime.addEventListener('change', onTimeSelectCange); // Синхронизация времени
+  roomSelect.addEventListener('change', onRoomSelectChange); // Валидация значений при смене количества комнат
+  capacitySelect.addEventListener('change', onRoomSelectChange); // Валидация значений при смене количества комнат
   resetFormButton.addEventListener('click', closeMap); // Обработчик для перехода к начальному состоянию
 };
 
@@ -311,9 +354,11 @@ var closeMap = function () {
   getInactiveForm(adForm); // Заблокирована форма №2 .ad-form
   removeNewMapPins();
   // Снятие обработчиков:
-  adFormTime.removeEventListener('change', adFormTimeCangeHandler);
-  roomSelect.removeEventListener('change', roomCapacitySelectChangeHandler);
-  capacitySelect.removeEventListener('change', roomCapacitySelectChangeHandler);
+  typeSelect.removeEventListener('change', onTypeSelectChange);
+  priceInput.removeEventListener('change', onPriceInputChange);
+  adFormTime.removeEventListener('change', onTimeSelectCange);
+  roomSelect.removeEventListener('change', onRoomSelectChange);
+  capacitySelect.removeEventListener('change', onRoomSelectChange);
   resetFormButton.removeEventListener('click', closeMap);
 };
 
