@@ -226,7 +226,7 @@ var setInactiveAdress = function () {
   var mainPinY = parseInt(mainPin.style.top, 10);
   var centerX = Math.floor(mainPinX + (MAIN_PIN_WIDTH / 2));
   var centerY = Math.floor(mainPinY + (MAIN_PIN_WIDTH / 2)); // не использую высоту, потому что метка круглая без хвостика
-  inputAddress.placeholder = (centerX + ', ' + centerY);
+  inputAddress.value = (centerX + ', ' + centerY);
 };
 
 
@@ -377,13 +377,16 @@ var openMap = function () {
   resetFormButton.addEventListener('click', closeMap); // Обработчик для перехода к начальному состоянию
 };
 
-var closeMap = function () {
+var closeMap = function (evt) {
   map.classList.add('map--faded');
   adForm.classList.add('ad-form--disabled');
+  removeNewMapPins();
   inactiveForm(mapFilter);
   inactiveForm(adForm);
+  evt.preventDefault();
+  adForm.reset();
   setInactiveAdress();
-  removeNewMapPins();
+
   // Снятие обработчиков:
   typeSelect.removeEventListener('change', onTypeSelectChange);
   priceInput.removeEventListener('input', onPriceInputChange);
