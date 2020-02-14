@@ -226,7 +226,7 @@ var setInactiveAdress = function () {
   var mainPinY = parseInt(mainPin.style.top, 10);
   var centerX = Math.floor(mainPinX + (MAIN_PIN_WIDTH / 2));
   var centerY = Math.floor(mainPinY + (MAIN_PIN_WIDTH / 2)); // не использую высоту, потому что метка круглая без хвостика
-  inputAddress.value = (centerX + ', ' + centerY);
+  inputAddress.placeholder = (centerX + ', ' + centerY);
 };
 
 
@@ -343,7 +343,7 @@ var getMainPinMarkCoord = function (pinX, pinY) {
 };
 
 // Функция, которыя устанавливает значения поля ввода адреса. Это координаты, на которые метка указывает своим острым концом.
-var getMouseСoordAddress = function (evt) {
+var setMouseСoordAddress = function (evt) {
   var mapCoord = map.getBoundingClientRect(); // получим координаты карты. X/Y-координаты начала прямоугольника относительно окна
   var mainPinX = Math.floor(evt.clientX - mapCoord.x); // получим координаты мышки относительно окна карты (это пин)
   var mainPinY = Math.floor(evt.clientY - mapCoord.y);
@@ -352,7 +352,7 @@ var getMouseСoordAddress = function (evt) {
 };
 
 // Функция, которыя устанавливает значения поля ввода адреса. Вариация для Enter
-var getKeyСoordinatesAddress = function (evt) {
+var setKeyСoordinatesAddress = function (evt) {
   var mainPinX = evt.target.offsetLeft;
   var mainPinY = evt.target.offsetTop;
   var pinMarkCoord = getMainPinMarkCoord(mainPinX, mainPinY); // внесем поправки для передачи координат
@@ -370,7 +370,7 @@ var openMap = function () {
   inputAddress.setAttribute('disabled', 'disabled'); // Заблокируем поля ввода адреса
   // Добавление обработчиков:
   typeSelect.addEventListener('change', onTypeSelectChange); // Проверка изменений по типу жилья
-  priceInput.addEventListener('change', onPriceInputChange); // Проверка изменений цены жилья
+  priceInput.addEventListener('input', onPriceInputChange); // Проверка изменений цены жилья
   adFormTime.addEventListener('change', onTimeSelectCange); // Синхронизация времени
   roomSelect.addEventListener('change', onRoomSelectChange); // Валидация значений при смене количества комнат
   capacitySelect.addEventListener('change', onRoomSelectChange); // Валидация значений при смене количества комнат
@@ -382,11 +382,11 @@ var closeMap = function () {
   adForm.classList.add('ad-form--disabled');
   inactiveForm(mapFilter);
   inactiveForm(adForm);
-  setInactiveAdress(); // ???? !!!! ВОПРОС ПОЧЕМУ ТУТ НЕ СРАБАТЫВАЕТ?
+  setInactiveAdress();
   removeNewMapPins();
   // Снятие обработчиков:
   typeSelect.removeEventListener('change', onTypeSelectChange);
-  priceInput.removeEventListener('change', onPriceInputChange);
+  priceInput.removeEventListener('input', onPriceInputChange);
   adFormTime.removeEventListener('change', onTimeSelectCange);
   roomSelect.removeEventListener('change', onRoomSelectChange);
   capacitySelect.removeEventListener('change', onRoomSelectChange);
@@ -398,7 +398,7 @@ var onMainPinClik = function (evt) {
     switch (evt.button) { // Проверка на то что клик приходит с левой кнопки мыши
       case LEFT_MOUSE_BUTTON:
         openMap();
-        getMouseСoordAddress(evt);
+        setMouseСoordAddress(evt);
     }
   }
 };
@@ -406,7 +406,7 @@ var onMainPinClik = function (evt) {
 var onMainPinKeydown = function (evt) {
   if (evt.key === ENTER_KEY) {
     openMap();
-    getKeyСoordinatesAddress(evt);
+    setKeyСoordinatesAddress(evt);
   }
 };
 
