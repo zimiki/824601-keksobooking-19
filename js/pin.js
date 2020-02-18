@@ -28,7 +28,7 @@
 
   window.pin = {
     render: renderPin,
-    remove: removeNewPins,
+    removeAllNew: removeNewPins,
   };
 
 })()
