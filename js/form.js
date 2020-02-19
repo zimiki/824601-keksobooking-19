@@ -11,7 +11,7 @@
   var capacitySelect = adForm.querySelector('#capacity');
   var adFormTime = adForm.querySelector('.ad-form__element--time');
   var inputAddress = adForm.querySelector('#address');
-  var resetFormButton = adForm.querySelector('.ad-form__reset'); // Элемент сбрасывающий карту до изначального неативного состояния
+  var resetButton = adForm.querySelector('.ad-form__reset'); // Элемент сбрасывающий карту до изначального неативного состояния
 
   // Функция, которая УСТАНАВЛИВАЕТ неактивное состояние на <input> и <select> формы с помощью атрибута disabled
   var inactiveFormInput = function (form) {
@@ -109,6 +109,11 @@
     inputAddress.value = (coords.x + ', ' + coords.y); // Записывает полученные коордианты как адрес
   };
 
+  // Функция, которая сбрасывает форму и карту
+  var onButtonResetClik = function (evt) {
+    inactiveForm(evt);
+    window.map.close();
+  };
 
   // Функция, которая приводит формы в активное состояние и добавляющая обработчики событий
   var activeForm = function () {
@@ -122,8 +127,7 @@
     adFormTime.addEventListener('change', onTimeSelectCange); // Синхронизация времени
     roomSelect.addEventListener('change', onRoomSelectChange); // Валидация значений при смене количества комнат
     capacitySelect.addEventListener('change', onRoomSelectChange); // Валидация значений при смене количества комнат
-    resetFormButton.addEventListener('click', window.map.close); // Обработчик для перехода к начальному состоянию
-    resetFormButton.addEventListener('click', inactiveForm); // Обработчик для перехода к начальному состоянию
+    resetButton.addEventListener('click', onButtonResetClik);
   };
 
   // Вариант активации от кнопки
@@ -138,7 +142,7 @@
     activeForm(); // + общие
   };
 
-
+  // Функция, которая приводит формы в неактивное состояние и убирает обработчики событий
   var inactiveForm = function (evt) {
     evt.preventDefault();
     adForm.reset();
@@ -151,8 +155,7 @@
     adFormTime.removeEventListener('change', onTimeSelectCange);
     roomSelect.removeEventListener('change', onRoomSelectChange);
     capacitySelect.removeEventListener('change', onRoomSelectChange);
-    resetFormButton.removeEventListener('click', inactiveForm);
-    resetFormButton.removeEventListener('click', window.map.close);
+    resetButton.removeEventListener('click', onButtonResetClik);
   };
 
 
