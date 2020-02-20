@@ -137,8 +137,7 @@
   };
 
   // Вариант активации от мышки
-  var mouseActiveForm = function (evt) {
-    setCoordsAdress(window.drag.getMouseСoordsAddress(evt)); // Координаты мышки
+  var mouseActiveForm = function () {
     activeForm(); // + общие
   };
 
@@ -149,7 +148,7 @@
     adForm.classList.add('ad-form--disabled');
     inactiveFormInput(mapFilter);
     inactiveFormInput(adForm);
-    setCoordsAdress(window.drag.getInactiveAdress());
+    setCoordsAdress(window.drag.setMainPinDefaultPosition());
     typeSelect.removeEventListener('change', onTypeSelectChange);
     priceInput.removeEventListener('input', onPriceInputChange);
     adFormTime.removeEventListener('change', onTimeSelectCange);
@@ -162,13 +161,14 @@
   // Приводит страницу в изначальное неактивное состояние
   inactiveFormInput(mapFilter); // Заблокирована форма №1 .map__filters
   inactiveFormInput(adForm); // Заблокирована форма №2 .ad-form
-  setCoordsAdress(window.drag.getInactiveAdress()); // Устанавливаем адрес = центру метки
+  setCoordsAdress(window.drag.setMainPinDefaultPosition()); // Устанавливаем адрес = центру метки
 
 
   window.form = {
     inactiveForm: inactiveForm,
     keyActiveForm: keyActiveForm,
-    mouseActiveForm: mouseActiveForm
+    mouseActiveForm: mouseActiveForm,
+    setCoordsAdress: setCoordsAdress
   };
 
 })()
