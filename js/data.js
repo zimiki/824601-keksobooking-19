@@ -96,8 +96,11 @@
     return arr;
   };
 
+  // Генерация случайных данных
+  var offers = getMockData();
+
   window.data = {
-    getMockData: getMockData,
+    offers: offers,
   };
 })()
 ;
