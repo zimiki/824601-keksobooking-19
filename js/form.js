@@ -122,23 +122,13 @@
     activeFormInput(adForm); // Снимает неактивное состояние c формы №2
     setMinPrice(); // Установим минимум цены для выбраного селекта из разметки
     inputAddress.setAttribute('disabled', 'disabled'); // Заблокируем поля ввода адреса
+    setCoordsAdress(window.drag.getMainPinMarkCoord()); // Показывает координаты осрого конца метки
     typeSelect.addEventListener('change', onTypeSelectChange); // Проверка изменений по типу жилья
     priceInput.addEventListener('input', onPriceInputChange); // Проверка изменений цены жилья
     adFormTime.addEventListener('change', onTimeSelectCange); // Синхронизация времени
     roomSelect.addEventListener('change', onRoomSelectChange); // Валидация значений при смене количества комнат
     capacitySelect.addEventListener('change', onRoomSelectChange); // Валидация значений при смене количества комнат
     resetButton.addEventListener('click', onButtonResetClik);
-  };
-
-  // Вариант активации от кнопки
-  var keyActiveForm = function (evt) {
-    setCoordsAdress(window.drag.getKeyСoordsAddress(evt)); // Координаты от кнопки
-    activeForm(); // + общие
-  };
-
-  // Вариант активации от мышки
-  var mouseActiveForm = function () {
-    activeForm(); // + общие
   };
 
   // Функция, которая приводит формы в неактивное состояние и убирает обработчики событий
@@ -166,8 +156,7 @@
 
   window.form = {
     inactiveForm: inactiveForm,
-    keyActiveForm: keyActiveForm,
-    mouseActiveForm: mouseActiveForm,
+    activeForm: activeForm,
     setCoordsAdress: setCoordsAdress
   };
 

@@ -81,11 +81,11 @@
     var cardPopup = map.querySelector('.popup'); // После того как вставили находим этот карточку
     cardPopup.querySelector('.popup__close').addEventListener('click', removeCard); // при вставке элемента навешиваем обоаботчики его удаления
   };
-  // ????  ВОПРОС снимать обработчик если узел удалить?
 
   // Функция, которая удаляет все вставленные фрагметом метки объявлений
   var removeCard = function () {
     var cardPopup = map.querySelector('.popup');
+    cardPopup.querySelector('.popup__close').removeEventListener('click', removeCard);
     cardPopup.remove();
   };
 
