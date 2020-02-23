@@ -6,12 +6,14 @@
 (function () {
   var map = document.querySelector('.map');
 
-
+  // Функция открытия карты с роверкой условия, была ли она до этого открыта
   var openMap = function () {
-    map.classList.remove('map--faded'); // Снимает неактивное состояние .map содержит класс map--faded;
-    var fragmentWithPins = window.util.getFragment(window.data.offers, window.pin.render); // Вызов функции создания фрагмента c pin объявлений
-    map.querySelector('.map__pins').appendChild(fragmentWithPins); // Добавление фрагмента c pin в DOM
-    window.pin.addAllClickListener();
+    if (map.classList.contains('map--faded')) {
+      map.classList.remove('map--faded'); // Снимает неактивное состояние .map содержит класс map--faded;
+      var fragmentWithPins = window.util.getFragment(window.data.offers, window.pin.render); // Вызов функции создания фрагмента c pin объявлений
+      map.querySelector('.map__pins').appendChild(fragmentWithPins); // Добавление фрагмента c pin в DOM
+      window.pin.addAllClickListener();
+    }
   };
 
 

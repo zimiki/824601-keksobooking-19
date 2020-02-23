@@ -43,18 +43,30 @@
     return true;
   };
 
+  // Функции для определения лимитов, в пределах которых учитываются события mouseMove
+  var getLimitsX = function (evt, sliderArea) {
+    var limits = {
+      min: sliderArea.x - HALF_MAIN_PIN_WIDTH + evt.offsetX, // минимум = положение map Сlient - учет для острого конца метки + учет где на метке был Click
+      max: sliderArea.x + sliderArea.width - HALF_MAIN_PIN_WIDTH + evt.offsetX, // // максимум = конец положения map Сlient - учет для острого конца метки + учет где на метке был Click
+    };
+    return limits;
+  };
+
+  var getLimitsY = function (evt, sliderArea) {
+    var limits = {
+      min: sliderArea.y + Y_MIN_DRAG + evt.offsetY, // минимум = по ТЗ + учет где на метке был Click
+      max: sliderArea.y + Y_MAX_DRAG + evt.offsetY // максимум = по ТЗ + учет где на метке был Click
+    };
+    return limits;
+  };
+
+
   // Функция слайдер
   var slider = function (evt) {
     evt.preventDefault();
     var mapParameters = map.getBoundingClientRect(); // положение карты относительно Сlient, потому что берем положение курсора тоже относительно Сlient
-
-    // Лимиты в предалх которых moveEvt может влиять на переопределение координат
-    var dragLimits = {
-      xMin: mapParameters.x - HALF_MAIN_PIN_WIDTH + evt.offsetX, // минимум = положение map Сlient - учет для острого конца метки + учет где на метке был Click
-      xMax: mapParameters.x + mapParameters.width - HALF_MAIN_PIN_WIDTH + evt.offsetX, // // максимум = конец положения map Сlient - учет для острого конца метки + учет где на метке был Click
-      yMin: mapParameters.y + Y_MIN_DRAG + evt.offsetY, // минимум = по ТЗ + учет где на метке был Click
-      yMax: mapParameters.y + Y_MAX_DRAG + evt.offsetY // максимум = по ТЗ + учет где на метке был Click
-    };
+    var limitsX = getLimitsX(evt, mapParameters);
+    var limitsY = getLimitsY(evt, mapParameters);
 
     var onMouseMove = function (moveEvt) {
       moveEvt.preventDefault();
@@ -67,10 +79,10 @@
       };
 
       // Используем фунцию проверки лимитов с тремя параметрами: 1.координта 2. максимум 3.минимум
-      if (checkLimits(moveEvt.clientX, dragLimits.xMin, dragLimits.xMax)) {
+      if (checkLimits(moveEvt.clientX, limitsX.min, limitsX.max)) {
         mainPin.style.left = mainPinCoords.x + 'px';
       }
-      if (checkLimits(moveEvt.clientY, dragLimits.yMin, dragLimits.yMax)) {
+      if (checkLimits(moveEvt.clientY, limitsY.min, limitsY.max)) {
         mainPin.style.top = mainPinCoords.y + 'px';
       }
 

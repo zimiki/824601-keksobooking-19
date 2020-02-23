@@ -115,20 +115,22 @@
     window.map.close();
   };
 
-  // Функция, которая приводит формы в активное состояние и добавляющая обработчики событий
+  // Функция, которая приводит формы в активное, с перварительнйо были ли форма уже активировна
   var activeForm = function () {
-    adForm.classList.remove('ad-form--disabled');
-    activeFormInput(mapFilter); // Снимает неактивное состояние c формы №1
-    activeFormInput(adForm); // Снимает неактивное состояние c формы №2
-    setMinPrice(); // Установим минимум цены для выбраного селекта из разметки
-    inputAddress.setAttribute('disabled', 'disabled'); // Заблокируем поля ввода адреса
-    setCoordsAdress(window.drag.getMainPinMarkCoord()); // Показывает координаты осрого конца метки
-    typeSelect.addEventListener('change', onTypeSelectChange); // Проверка изменений по типу жилья
-    priceInput.addEventListener('input', onPriceInputChange); // Проверка изменений цены жилья
-    adFormTime.addEventListener('change', onTimeSelectCange); // Синхронизация времени
-    roomSelect.addEventListener('change', onRoomSelectChange); // Валидация значений при смене количества комнат
-    capacitySelect.addEventListener('change', onRoomSelectChange); // Валидация значений при смене количества комнат
-    resetButton.addEventListener('click', onButtonResetClik);
+    if (adForm.classList.contains('ad-form--disabled')) {
+      adForm.classList.remove('ad-form--disabled');
+      activeFormInput(mapFilter); // Снимает неактивное состояние c формы №1
+      activeFormInput(adForm); // Снимает неактивное состояние c формы №2
+      setMinPrice(); // Установим минимум цены для выбраного селекта из разметки
+      inputAddress.setAttribute('disabled', 'disabled'); // Заблокируем поля ввода адреса
+      setCoordsAdress(window.drag.getMainPinMarkCoord()); // Показывает координаты осрого конца метки
+      typeSelect.addEventListener('change', onTypeSelectChange); // Проверка изменений по типу жилья
+      priceInput.addEventListener('input', onPriceInputChange); // Проверка изменений цены жилья
+      adFormTime.addEventListener('change', onTimeSelectCange); // Синхронизация времени
+      roomSelect.addEventListener('change', onRoomSelectChange); // Валидация значений при смене количества комнат
+      capacitySelect.addEventListener('change', onRoomSelectChange); // Валидация значений при смене количества комнат
+      resetButton.addEventListener('click', onButtonResetClik);
+    }
   };
 
   // Функция, которая приводит формы в неактивное состояние и убирает обработчики событий
