@@ -115,31 +115,22 @@
     window.map.close();
   };
 
-  // Функция, которая приводит формы в активное состояние и добавляющая обработчики событий
+  // Функция, которая приводит формы в активное, с перварительнйо были ли форма уже активировна
   var activeForm = function () {
-    adForm.classList.remove('ad-form--disabled');
-    activeFormInput(mapFilter); // Снимает неактивное состояние c формы №1
-    activeFormInput(adForm); // Снимает неактивное состояние c формы №2
-    setMinPrice(); // Установим минимум цены для выбраного селекта из разметки
-    inputAddress.setAttribute('disabled', 'disabled'); // Заблокируем поля ввода адреса
-    typeSelect.addEventListener('change', onTypeSelectChange); // Проверка изменений по типу жилья
-    priceInput.addEventListener('input', onPriceInputChange); // Проверка изменений цены жилья
-    adFormTime.addEventListener('change', onTimeSelectCange); // Синхронизация времени
-    roomSelect.addEventListener('change', onRoomSelectChange); // Валидация значений при смене количества комнат
-    capacitySelect.addEventListener('change', onRoomSelectChange); // Валидация значений при смене количества комнат
-    resetButton.addEventListener('click', onButtonResetClik);
-  };
-
-  // Вариант активации от кнопки
-  var keyActiveForm = function (evt) {
-    setCoordsAdress(window.drag.getKeyСoordsAddress(evt)); // Координаты от кнопки
-    activeForm(); // + общие
-  };
-
-  // Вариант активации от мышки
-  var mouseActiveForm = function (evt) {
-    setCoordsAdress(window.drag.getMouseСoordsAddress(evt)); // Координаты мышки
-    activeForm(); // + общие
+    if (adForm.classList.contains('ad-form--disabled')) {
+      adForm.classList.remove('ad-form--disabled');
+      activeFormInput(mapFilter); // Снимает неактивное состояние c формы №1
+      activeFormInput(adForm); // Снимает неактивное состояние c формы №2
+      setMinPrice(); // Установим минимум цены для выбраного селекта из разметки
+      inputAddress.setAttribute('disabled', 'disabled'); // Заблокируем поля ввода адреса
+      setCoordsAdress(window.drag.getMainPinMarkCoord()); // Показывает координаты осрого конца метки
+      typeSelect.addEventListener('change', onTypeSelectChange); // Проверка изменений по типу жилья
+      priceInput.addEventListener('input', onPriceInputChange); // Проверка изменений цены жилья
+      adFormTime.addEventListener('change', onTimeSelectCange); // Синхронизация времени
+      roomSelect.addEventListener('change', onRoomSelectChange); // Валидация значений при смене количества комнат
+      capacitySelect.addEventListener('change', onRoomSelectChange); // Валидация значений при смене количества комнат
+      resetButton.addEventListener('click', onButtonResetClik);
+    }
   };
 
   // Функция, которая приводит формы в неактивное состояние и убирает обработчики событий
@@ -149,7 +140,7 @@
     adForm.classList.add('ad-form--disabled');
     inactiveFormInput(mapFilter);
     inactiveFormInput(adForm);
-    setCoordsAdress(window.drag.getInactiveAdress());
+    setCoordsAdress(window.drag.setMainPinDefaultPosition());
     typeSelect.removeEventListener('change', onTypeSelectChange);
     priceInput.removeEventListener('input', onPriceInputChange);
     adFormTime.removeEventListener('change', onTimeSelectCange);
@@ -162,13 +153,13 @@
   // Приводит страницу в изначальное неактивное состояние
   inactiveFormInput(mapFilter); // Заблокирована форма №1 .map__filters
   inactiveFormInput(adForm); // Заблокирована форма №2 .ad-form
-  setCoordsAdress(window.drag.getInactiveAdress()); // Устанавливаем адрес = центру метки
+  setCoordsAdress(window.drag.setMainPinDefaultPosition()); // Устанавливаем адрес = центру метки
 
 
   window.form = {
     inactiveForm: inactiveForm,
-    keyActiveForm: keyActiveForm,
-    mouseActiveForm: mouseActiveForm
+    activeForm: activeForm,
+    setCoordsAdress: setCoordsAdress
   };
 
 })()

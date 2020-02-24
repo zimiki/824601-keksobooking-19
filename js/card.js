@@ -5,6 +5,8 @@
 (function () {
   var similarPhotoTemplate = document.querySelector('#card').content.querySelector('.popup__photo');
   var cardOfferTemplate = document.querySelector('#card').content.querySelector('.map__card');
+  var map = document.querySelector('.map');
+  var referenceElement = map.querySelector('.map__filters-container'); // определение блока перед которым нужно вставить card перед блоком.map__filters-container
 
   // Функция создания одного DOM-элемента на основе данных для PHOTO. Каждая строка массива  должна записываться как src
   var renderPhoto = function (photo) {
@@ -68,8 +70,27 @@
     return card;
   };
 
+
+  // Функция вставки нового элемента в DOM
+  var addOfferCard = function (offer) {
+    if (map.querySelector('.popup')) { // Проверяем была ли до этого вызвана карточка, если она вызвана, нужно ее убрать
+      removeCard();
+    }
+    var card = renderOfferCard(offer); // Вызываем функцию отрисовки карточки
+    map.insertBefore(card, referenceElement); // Вставка card в карту
+    var cardPopup = map.querySelector('.popup'); // После того как вставили находим этот карточку
+    cardPopup.querySelector('.popup__close').addEventListener('click', removeCard); // при вставке элемента навешиваем обоаботчики его удаления
+  };
+
+  // Функция, которая удаляет все вставленные фрагметом метки объявлений
+  var removeCard = function () {
+    var cardPopup = map.querySelector('.popup');
+    cardPopup.querySelector('.popup__close').removeEventListener('click', removeCard);
+    cardPopup.remove();
+  };
+
   window.card = {
-    render: renderOfferCard,
+    add: addOfferCard
   };
 
 })()

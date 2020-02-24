@@ -6,13 +6,14 @@
 (function () {
   var map = document.querySelector('.map');
 
-  // Генерация случайных данных
-  var offers = window.data.getMockData();
-
+  // Функция открытия карты с роверкой условия, была ли она до этого открыта
   var openMap = function () {
-    map.classList.remove('map--faded'); // Снимает неактивное состояние .map содержит класс map--faded;
-    var fragmentWithPins = window.util.getFragment(offers, window.pin.render); // Вызов функции создания фрагмента c pin объявлений
-    map.querySelector('.map__pins').appendChild(fragmentWithPins); // Добавление фрагмента c pin в DOM
+    if (map.classList.contains('map--faded')) {
+      map.classList.remove('map--faded'); // Снимает неактивное состояние .map содержит класс map--faded;
+      var fragmentWithPins = window.util.getFragment(window.data.offers, window.pin.render); // Вызов функции создания фрагмента c pin объявлений
+      map.querySelector('.map__pins').appendChild(fragmentWithPins); // Добавление фрагмента c pin в DOM
+      window.pin.addAllClickListener();
+    }
   };
 
 
@@ -25,13 +26,6 @@
     open: openMap,
     close: closeMap
   };
-
-  /*
-  // 4. Отрисовка карточки предложения
-  var card = window.card.render(offers[0]);
-  var referenceElement = map.querySelector('.map__filters-container');
-  map.insertBefore(card, referenceElement); // Вставка CARD в блок .map перед блоком.map__filters-container
-*/
 
 })()
 ;
