@@ -118,12 +118,20 @@
     window.map.close();
   };
 
-  // -------------------------------------------------------
-  //  Функция отрисовки сообщений об отправки формы
+
+  /*
+  ----------------------------------------------------------------
+           Н А Ч А Л О     З А Д А Н И Е    О Т П Р А В К А
+
+*/
+
+  // Отрисовка сообщений об отправки формы
   var renderSuccessMessage = function () {
     var successMessage = successTemplate.cloneNode(true);
     main.insertAdjacentElement('afterbegin', successMessage);
   };
+
+  // Отрисовка сообщений об ошибки отправки формы
   var renderErrorMessage = function () {
     var errorMessage = errorTemplate.cloneNode(true);
     main.insertAdjacentElement('afterbegin', errorMessage);
@@ -131,12 +139,14 @@
     document.addEventListener('keydown', onErrorEscKeydown);
   };
 
+  // Обработчик события нажатия кнопки ESC для закрытия собщения
   var onErrorEscKeydown = function (evt) {
     if (evt.key === window.util.ESC_KEY) {
       removeErrorMessage();
     }
   };
 
+  // Функция, которая убирает собщение об ошибки и удаляет все обработчики
   var removeErrorMessage = function () {
     var errorMessage = main.querySelector('.error');
     main.querySelector('.error__button').removeEventListener('click', removeErrorMessage);
@@ -145,13 +155,26 @@
   };
 
 
+  var onSuccessSubmit = function () { // случай успешной отправки
+    renderSuccessMessage(); // отрисовка собщения об успешной отправки
+    inactiveForm(); // возвращает страницу в неактивное состояние и сбросьте форму
+  };
+
+  var onErrorSubmit = function () {
+    renderErrorMessage();
+  };
+
   // Функция, которая обрабатывает событие Submit
   var onButtonSubmitClick = function (evt) {
-    window.upload(new FormData(adForm), function (response) {
-      renderErrorMessage();
-    });
+    window.upload(new FormData(adForm), onSuccessSubmit, onErrorSubmit);
     evt.preventDefault();
   };
+
+  /*
+       ------------------------------------------------------
+            К О Н Е Ц    З А Д А Н И Е    О Т П Р А В К А
+*/
+
 
   // Функция, которая приводит формы в активное, с перварительнйо были ли форма уже активировна
   var activeForm = function () {
@@ -175,7 +198,7 @@
   // Функция, которая приводит формы в неактивное состояние и убирает обработчики событий
   var inactiveForm = function (evt) {
     evt.preventDefault();
-    adForm.reset();
+    adForm.reset(); // сброс формы
     adForm.classList.add('ad-form--disabled');
     inactiveFormInput(mapFilter);
     inactiveFormInput(adForm);
@@ -190,13 +213,10 @@
   };
 
   // Приводит страницу в изначальное неактивное состояние
-  var setDefaultPageSetting = function () {
-    inactiveFormInput(mapFilter); // Заблокирована форма №1 .map__filters
-    inactiveFormInput(adForm); // Заблокирована форма №2 .ad-form
-    setCoordsAdress(window.drag.setMainPinDefaultPosition()); // Устанавливаем адрес = центру метки
-  };
+  inactiveFormInput(mapFilter); // Заблокирована форма №1 .map__filters
+  inactiveFormInput(adForm); // Заблокирована форма №2 .ad-form
+  setCoordsAdress(window.drag.setMainPinDefaultPosition()); // Устанавливаем адрес = центру метки
 
-  setDefaultPageSetting();
 
   window.form = {
     inactiveForm: inactiveForm,
