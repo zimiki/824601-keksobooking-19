@@ -122,8 +122,7 @@
 
   /*
   ----------------------------------------------------------------
-           Н А Ч А Л О     З А Д А Н И Е    О Т П Р А В К А
-
+           О Т П Р А В К А
 */
 
   // УСПЕХ
@@ -132,6 +131,8 @@
     main.insertAdjacentElement('afterbegin', successMessage);
     document.addEventListener('keydown', onSuccessEscKeydown); // Сообщение должно исчезать по нажатию на клавишу Esc
     document.addEventListener('click', removeSuccessMessage); // Сообщение должно исчезать по клику на произвольную область экрана
+    inactiveForm(); // сбрасывает форму и возвращает страницу в неактивное состояние
+    window.map.close();
   };
 
   // Обработчик события нажатия кнопки ESC для закрытия собщения
@@ -142,15 +143,12 @@
   };
 
   // Функция, которая убирает собщение об УСПЕШНОЙ и удаляет все обработчики
-  var removeSuccessMessage = function (evt) {
+  var removeSuccessMessage = function () {
     var successMessage = main.querySelector('.success');
-    document.removeEventListener('keydown', onErrorEscKeydown);
+    document.removeEventListener('keydown', onSuccessEscKeydown);
     document.removeEventListener('click', removeSuccessMessage);
     successMessage.remove();
-    inactiveForm(evt); // сбрасывает форму и возвращает страницу в неактивное состояние
-    window.map.close();
   };
-
 
   // ОШИБКА
   var onErrorSubmit = function () { // случай ошибки отправки
@@ -179,14 +177,9 @@
 
   // Функция, которая обрабатывает событие Submit
   var onButtonSubmitClick = function (evt) {
-    window.upload(new FormData(adForm), onSuccessSubmit, onErrorSubmit); // !!! Данные почему то некорректные
+    window.upload(new FormData(adForm), onSuccessSubmit, onErrorSubmit);
     evt.preventDefault();
   };
-
-  /*
-       ------------------------------------------------------
-            К О Н Е Ц    З А Д А Н И Е    О Т П Р А В К А
-*/
 
 
   // Функция, которая приводит формы в активное, с перварительнйо были ли форма уже активировна

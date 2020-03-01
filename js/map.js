@@ -42,6 +42,7 @@
   var closeMap = function () {
     map.classList.add('map--faded');
     window.pin.removeAllNew();
+    window.card.remove();
   };
 
   window.map = {

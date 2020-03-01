@@ -90,6 +90,7 @@
   };
 
   window.card = {
+    remove: removeCard,
     add: addOfferCard
   };
 
