@@ -18,14 +18,14 @@
 
 
   // 2.Функция которая добавляет на все новые метки обработчик события клик
-  var addAllPinsClickListener = function () {
+  var addAllPinsClickListener = function (arr) {
     var newMapPins = mapPins.querySelectorAll('.map__pin'); // Найдем массив новых меток
 
     // Функция замыкания, чтобы создать отдельное событие для каждой метки в отдельности
     var addPinClickListener = function (pin, j) {
       var onPinClick = function () {
         var numberOffer = j - 1; // на 1 меньше потому, что массив newMapPins начинается с mainPin
-        window.card.add(window.data.offers[numberOffer]);
+        window.card.add(arr[numberOffer]);
       };
       // Добавление обработчиков
       pin.addEventListener('click', onPinClick);
