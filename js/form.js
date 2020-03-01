@@ -114,7 +114,8 @@
 
   // Функция, которая сбрасывает форму и карту
   var onButtonResetClik = function (evt) {
-    inactiveForm(evt);
+    evt.preventDefault();
+    inactiveForm();
     window.map.close();
   };
 
@@ -141,12 +142,13 @@
   };
 
   // Функция, которая убирает собщение об УСПЕШНОЙ и удаляет все обработчики
-  var removeSuccessMessage = function () {
+  var removeSuccessMessage = function (evt) {
     var successMessage = main.querySelector('.success');
     document.removeEventListener('keydown', onErrorEscKeydown);
-    document.renoveEventListener('click', removeSuccessMessage);
+    document.removeEventListener('click', removeSuccessMessage);
     successMessage.remove();
-    inactiveForm(); // возвращает страницу в неактивное состояние и сбросьте форму
+    inactiveForm(evt); // сбрасывает форму и возвращает страницу в неактивное состояние
+    window.map.close();
   };
 
 
@@ -155,8 +157,8 @@
     var errorMessage = errorTemplate.cloneNode(true);
     main.insertAdjacentElement('afterbegin', errorMessage);
     main.querySelector('.error__button').addEventListener('click', removeErrorMessage); // Cообщение должно исчезать после нажатия на кнопку .error__button
+    document.addEventListener('click', removeErrorMessage); // Сообщение должно исчезать по клику на произвольную область экрана
     document.addEventListener('keydown', onErrorEscKeydown); // Сообщение должно исчезать по нажатию на клавишу Esc
-    // !!!  ????? Сообщение должно исчезать по клику на произвольную область экрана
   };
 
   // Обработчик события нажатия кнопки ESC для закрытия собщения
@@ -170,6 +172,7 @@
   var removeErrorMessage = function () {
     var errorMessage = main.querySelector('.error');
     main.querySelector('.error__button').removeEventListener('click', removeErrorMessage);
+    document.removeEventListener('click', removeErrorMessage);
     document.removeEventListener('keydown', onErrorEscKeydown);
     errorMessage.remove();
   };
@@ -193,7 +196,7 @@
       activeFormInput(mapFilter); // Снимает неактивное состояние c формы №1
       activeFormInput(adForm); // Снимает неактивное состояние c формы №2
       setMinPrice(); // Установим минимум цены для выбраного селекта из разметки
-      inputAddress.setAttribute('disabled', 'disabled'); // Заблокируем поля ввода адреса
+      inputAddress.setAttribute('readonly', 'readonly'); // Заблокируем поля ввода адреса
       setCoordsAdress(window.drag.getMainPinMarkCoord()); // Показывает координаты осрого конца метки
       typeSelect.addEventListener('change', onTypeSelectChange); // Проверка изменений по типу жилья
       priceInput.addEventListener('input', onPriceInputChange); // Проверка изменений цены жилья
@@ -206,8 +209,7 @@
   };
 
   // Функция, которая приводит формы в неактивное состояние и убирает обработчики событий
-  var inactiveForm = function (evt) {
-    evt.preventDefault();
+  var inactiveForm = function () {
     adForm.reset(); // сброс формы
     adForm.classList.add('ad-form--disabled');
     inactiveFormInput(mapFilter);
@@ -229,7 +231,6 @@
 
 
   window.form = {
-    inactiveForm: inactiveForm,
     activeForm: activeForm,
     setCoordsAdress: setCoordsAdress
   };
