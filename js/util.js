@@ -17,6 +17,7 @@
 
   window.util = {
     ENTER_KEY: 'Enter',
+    ESC_KEY: 'Escape',
     LEFT_MOUSE_BUTTON: 0,
     PIN_WIDTH: PIN_WIDTH,
     PIN_HEIGHT: PIN_HEIGHT,

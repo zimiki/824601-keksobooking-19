@@ -12,6 +12,9 @@
   var adFormTime = adForm.querySelector('.ad-form__element--time');
   var inputAddress = adForm.querySelector('#address');
   var resetButton = adForm.querySelector('.ad-form__reset'); // Элемент сбрасывающий карту до изначального неативного состояния
+  var main = document.querySelector('main');
+  var successTemplate = document.querySelector('#success').content.querySelector('.success');
+  var errorTemplate = document.querySelector('#error').content.querySelector('.error');
 
   // Функция, которая УСТАНАВЛИВАЕТ неактивное состояние на <input> и <select> формы с помощью атрибута disabled
   var inactiveFormInput = function (form) {
@@ -115,6 +118,41 @@
     window.map.close();
   };
 
+  // -------------------------------------------------------
+  //  Функция отрисовки сообщений об отправки формы
+  var renderSuccessMessage = function () {
+    var successMessage = successTemplate.cloneNode(true);
+    main.insertAdjacentElement('afterbegin', successMessage);
+  };
+  var renderErrorMessage = function () {
+    var errorMessage = errorTemplate.cloneNode(true);
+    main.insertAdjacentElement('afterbegin', errorMessage);
+    main.querySelector('.error__button').addEventListener('click', removeErrorMessage);
+    document.addEventListener('keydown', onErrorEscKeydown);
+  };
+
+  var onErrorEscKeydown = function (evt) {
+    if (evt.key === window.util.ESC_KEY) {
+      removeErrorMessage();
+    }
+  };
+
+  var removeErrorMessage = function () {
+    var errorMessage = main.querySelector('.error');
+    main.querySelector('.error__button').removeEventListener('click', removeErrorMessage);
+    document.removeEventListener('keydown', onErrorEscKeydown);
+    errorMessage.remove();
+  };
+
+
+  // Функция, которая обрабатывает событие Submit
+  var onButtonSubmitClick = function (evt) {
+    window.upload(new FormData(adForm), function (response) {
+      renderErrorMessage();
+    });
+    evt.preventDefault();
+  };
+
   // Функция, которая приводит формы в активное, с перварительнйо были ли форма уже активировна
   var activeForm = function () {
     if (adForm.classList.contains('ad-form--disabled')) {
@@ -130,6 +168,7 @@
       roomSelect.addEventListener('change', onRoomSelectChange); // Валидация значений при смене количества комнат
       capacitySelect.addEventListener('change', onRoomSelectChange); // Валидация значений при смене количества комнат
       resetButton.addEventListener('click', onButtonResetClik);
+      adForm.addEventListener('submit', onButtonSubmitClick);
     }
   };
 
@@ -147,14 +186,17 @@
     roomSelect.removeEventListener('change', onRoomSelectChange);
     capacitySelect.removeEventListener('change', onRoomSelectChange);
     resetButton.removeEventListener('click', onButtonResetClik);
+    adForm.removeEventListener('submit', onButtonSubmitClick);
   };
 
-
   // Приводит страницу в изначальное неактивное состояние
-  inactiveFormInput(mapFilter); // Заблокирована форма №1 .map__filters
-  inactiveFormInput(adForm); // Заблокирована форма №2 .ad-form
-  setCoordsAdress(window.drag.setMainPinDefaultPosition()); // Устанавливаем адрес = центру метки
+  var setDefaultPageSetting = function () {
+    inactiveFormInput(mapFilter); // Заблокирована форма №1 .map__filters
+    inactiveFormInput(adForm); // Заблокирована форма №2 .ad-form
+    setCoordsAdress(window.drag.setMainPinDefaultPosition()); // Устанавливаем адрес = центру метки
+  };
 
+  setDefaultPageSetting();
 
   window.form = {
     inactiveForm: inactiveForm,
