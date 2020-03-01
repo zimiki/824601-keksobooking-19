@@ -125,18 +125,38 @@
 
 */
 
-  // Отрисовка сообщений об отправки формы
-  var renderSuccessMessage = function () {
-    var successMessage = successTemplate.cloneNode(true);
+  // УСПЕХ
+  var onSuccessSubmit = function () { // случай успешной отправки
+    var successMessage = successTemplate.cloneNode(true); // отрисовка собщения об успешной отправки
     main.insertAdjacentElement('afterbegin', successMessage);
+    document.addEventListener('keydown', onSuccessEscKeydown); // Сообщение должно исчезать по нажатию на клавишу Esc
+    document.addEventListener('click', removeSuccessMessage); // Сообщение должно исчезать по клику на произвольную область экрана
   };
 
-  // Отрисовка сообщений об ошибки отправки формы
-  var renderErrorMessage = function () {
+  // Обработчик события нажатия кнопки ESC для закрытия собщения
+  var onSuccessEscKeydown = function (evt) {
+    if (evt.key === window.util.ESC_KEY) {
+      removeSuccessMessage();
+    }
+  };
+
+  // Функция, которая убирает собщение об УСПЕШНОЙ и удаляет все обработчики
+  var removeSuccessMessage = function () {
+    var successMessage = main.querySelector('.success');
+    document.removeEventListener('keydown', onErrorEscKeydown);
+    document.renoveEventListener('click', removeSuccessMessage);
+    successMessage.remove();
+    inactiveForm(); // возвращает страницу в неактивное состояние и сбросьте форму
+  };
+
+
+  // ОШИБКА
+  var onErrorSubmit = function () { // случай ошибки отправки
     var errorMessage = errorTemplate.cloneNode(true);
     main.insertAdjacentElement('afterbegin', errorMessage);
-    main.querySelector('.error__button').addEventListener('click', removeErrorMessage);
-    document.addEventListener('keydown', onErrorEscKeydown);
+    main.querySelector('.error__button').addEventListener('click', removeErrorMessage); // Cообщение должно исчезать после нажатия на кнопку .error__button
+    document.addEventListener('keydown', onErrorEscKeydown); // Сообщение должно исчезать по нажатию на клавишу Esc
+    // !!!  ????? Сообщение должно исчезать по клику на произвольную область экрана
   };
 
   // Обработчик события нажатия кнопки ESC для закрытия собщения
@@ -146,7 +166,7 @@
     }
   };
 
-  // Функция, которая убирает собщение об ошибки и удаляет все обработчики
+  // Функция, которая убирает собщение об ОШИБКЕ и удаляет все обработчики
   var removeErrorMessage = function () {
     var errorMessage = main.querySelector('.error');
     main.querySelector('.error__button').removeEventListener('click', removeErrorMessage);
@@ -154,19 +174,9 @@
     errorMessage.remove();
   };
 
-
-  var onSuccessSubmit = function () { // случай успешной отправки
-    renderSuccessMessage(); // отрисовка собщения об успешной отправки
-    inactiveForm(); // возвращает страницу в неактивное состояние и сбросьте форму
-  };
-
-  var onErrorSubmit = function () {
-    renderErrorMessage();
-  };
-
   // Функция, которая обрабатывает событие Submit
   var onButtonSubmitClick = function (evt) {
-    window.upload(new FormData(adForm), onSuccessSubmit, onErrorSubmit);
+    window.upload(new FormData(adForm), onSuccessSubmit, onErrorSubmit); // !!! Данные почему то некорректные
     evt.preventDefault();
   };
 
@@ -191,7 +201,7 @@
       roomSelect.addEventListener('change', onRoomSelectChange); // Валидация значений при смене количества комнат
       capacitySelect.addEventListener('change', onRoomSelectChange); // Валидация значений при смене количества комнат
       resetButton.addEventListener('click', onButtonResetClik);
-      adForm.addEventListener('submit', onButtonSubmitClick);
+      adForm.addEventListener('submit', onButtonSubmitClick); // !!! НОВОЕ ЗАДАНИЕ
     }
   };
 
