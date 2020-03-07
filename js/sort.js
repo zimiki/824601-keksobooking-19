@@ -4,7 +4,7 @@
 
 (function () {
   var mapFilter = document.querySelector('.map__filters'); // Форма №1 .map__filters
-  var housingTypeSelect = mapFilter.querySelector('#housing-type'); // селект с типом жилья
+
   var NUMBER_PINS_ON_MAP = 5; // выводить на карту не более 5 меток
 
 
@@ -14,12 +14,19 @@
     return maxArrLengt;
   };
 
+  // Проверку нужно ли применять фильтр
+  var itSort = function (select) {
+    if (select.value === 'any') {
+      return false;
+    }
+    return true;
+  };
+
   // Получение нового массива по выбраному селекту жилья, возвращает массив
   var getSortArrHousingType = function (arr) {
-    var sortArr = [];
-    if (housingTypeSelect.value === 'any') {
-      sortArr = arr.slice();
-    } else {
+    var housingTypeSelect = mapFilter.querySelector('#housing-type'); // селект с типом жилья
+    var sortArr = arr.slice();
+    if (itSort(housingTypeSelect)) {
       sortArr = arr.filter(function (offer) {
         return offer.offer.type === housingTypeSelect.value;
       });
