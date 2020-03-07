@@ -34,7 +34,7 @@
     // Цикл для установки обработчки на каждый пин кроме первого, потому что перый - главная метка
     for (var j = 1; j < newMapPins.length; j++) {
       var pin = newMapPins[j];
-      addPinClickListener(pin, j);
+      addPinClickListener(pin, j); // !!! ВОПРОС ГДЕ ЭТИ ОБРАБОТЧКИКИ ЯВНО СНИМАЮТСЯ ?
     }
   };
 

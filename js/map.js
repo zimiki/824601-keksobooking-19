@@ -1,21 +1,38 @@
 'use strict';
 
-// Модуль, который управляет карточками объявлений и метками:
-// добавляет на страницу нужную карточку, отрисовывает метки и осуществляет взаимодействие карточки и метки на карте
+// Модуль, который отвечает запускает отрисоку меток и карточек на карте
 
 (function () {
   var map = document.querySelector('.map');
+  var mapFilter = document.querySelector('.map__filters'); // Форма №1 .map__filters
+
+
+  var renderMapPins = function (arr) {
+    var fragmentWithPins = window.util.getFragment(arr, window.pin.render);
+    map.querySelector('.map__pins').appendChild(fragmentWithPins); // Добавление фрагмента c pin в DOM
+    window.pin.addAllClickListener(arr);
+  };
+
 
   // Если успешно загрузились данные
-  var onSuccess = function (offers) {
+  var onSuccess = function (data) {
     var loadErrorMessage = document.querySelector('.error-load');
     if (loadErrorMessage) {
       loadErrorMessage.remove();
     }
-    var fragmentWithPins = window.util.getFragment(offers, window.pin.render); // Вызов функции создания фрагмента c pin объявлений
-    map.querySelector('.map__pins').appendChild(fragmentWithPins); // Добавление фрагмента c pin в DOM
+
+    // Обработчик события смены чего то в фильтрах
+    var onMapFilterCange = function () {
+      window.card.remove();
+      window.pin.removeAllNew();
+      var newSort = window.sort.get(data);
+      renderMapPins(newSort);
+    };
+
     map.classList.remove('map--faded'); // Снимает неактивное состояние .map содержит класс map--faded;
-    window.pin.addAllClickListener(offers);
+    var offers = window.sort.get(data); // определение данных на отрисовку
+    renderMapPins(offers);
+    mapFilter.addEventListener('change', onMapFilterCange); // !!! ВОПРОС КАК ЕГО СНЯТЬ ПРИ ЗАКРЫТИИ КАРТЫ ???
   };
 
   // Если не успешно загрузились данные
@@ -41,8 +58,8 @@
   // Функция закрытия карты
   var closeMap = function () {
     map.classList.add('map--faded');
-    window.pin.removeAllNew();
     window.card.remove();
+    window.pin.removeAllNew();
   };
 
   window.map = {

@@ -29,21 +29,6 @@
     }
   };
 
-  // Функция получения текстового значения. Квартира для flat, Бунгало для bungalo, Дом для house, Дворец для palace.
-  var getTypeText = function (type) {
-    var typeOffer = 'не указано';
-    if (type === 'flat') {
-      typeOffer = 'квартира';
-    } else if (type === 'bungalo') {
-      typeOffer = 'бунгало';
-    } else if (type === 'house') {
-      typeOffer = 'дом';
-    } else if (type === 'palace') {
-      typeOffer = 'дворец';
-    }
-    return typeOffer;
-  };
-
   // Функция создания одного DOM-элемента CARD на основе данных
   var renderOfferCard = function (offer) {
     var card = cardOfferTemplate.cloneNode(true);
@@ -54,7 +39,7 @@
     card.querySelector('.popup__text--time').textContent = 'заезд после ' + offer.offer.checkin + ', выезд до ' + offer.offer.checkout; // заезд после 14:00, выезд до 12:00.
     card.querySelector('.popup__description').textContent = offer.offer.description; // в блок .popup__description выведите описание объекта недвижимости offer.description.
     card.querySelector('.popup__avatar').src = offer.author.avatar; //  src у аватарки пользователя —  author.avatar отрисовываемого объекта
-    card.querySelector('.popup__type').textContent = getTypeText(offer.offer.type);
+    card.querySelector('.popup__type').textContent = window.util.housingTypeList[offer.offer.type];
 
     // В блок .popup__photos выводим все фотографии из списка offer.photos
     var photos = card.querySelector('.popup__photos');
@@ -85,8 +70,10 @@
   // Функция, которая удаляет все вставленные фрагметом метки объявлений
   var removeCard = function () {
     var cardPopup = map.querySelector('.popup');
-    cardPopup.querySelector('.popup__close').removeEventListener('click', removeCard);
-    cardPopup.remove();
+    if (cardPopup) {
+      cardPopup.querySelector('.popup__close').removeEventListener('click', removeCard);
+      cardPopup.remove();
+    }
   };
 
   window.card = {
