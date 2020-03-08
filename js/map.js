@@ -30,12 +30,12 @@
     };
 
     map.classList.remove('map--faded'); // Снимает неактивное состояние .map содержит класс map--faded;
-    var offers = window.sort.get(data); // определение данных на отрисовку
+    var offers = window.sort.get(data); // Определение данных на отрисовку
     renderMapPins(offers);
     mapFilter.addEventListener('change', onMapFilterCange); // !!! ВОПРОС КАК ЕГО СНЯТЬ ПРИ ЗАКРЫТИИ КАРТЫ ???
   };
 
-  // Если не успешно загрузились данные
+  // Если не успешно загрузились данные, нет шаблона для отображения этого события. Использован пример из лекции
   var onError = function (errorMessage) {
     var node = document.createElement('div');
     node.classList.add('error-load');

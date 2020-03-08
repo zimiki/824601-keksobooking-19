@@ -10,6 +10,13 @@
     'palace': 'дворец'
   };
 
+  var minPriceList = {
+    'bungalo': 0,
+    'flat': 1000,
+    'house': 5000,
+    'palace': 10000
+  };
+
   // Функция создания фрагмента, принимает массив данных и функцию отрисовки элемента
   var getFragment = function (arr, renderElement) {
     var fragment = document.createDocumentFragment();
@@ -23,6 +30,7 @@
     ENTER_KEY: 'Enter',
     ESC_KEY: 'Escape',
     housingTypeList: housingTypeList,
+    minPriceList: minPriceList,
     LEFT_MOUSE_BUTTON: 0,
     PIN_WIDTH: PIN_WIDTH,
     PIN_HEIGHT: PIN_HEIGHT,

@@ -7,6 +7,9 @@
   var NUMBER_PINS_ON_MAP = 5; // выводить на карту не более 5 меток
   var housingTypeSelect = mapFilter.querySelector('#housing-type'); // селект с типом жилья
   var housingPriceSelect = mapFilter.querySelector('#housing-price'); // селект с цены
+  var housingRoomsSelect = mapFilter.querySelector('#housing-rooms'); // селект с комнатами
+  var housingGuestsSelect = mapFilter.querySelector('#housing-guests'); // селект с гостями
+
   var Price = {
     LOW: 10000,
     HIGH: 50000
@@ -61,12 +64,85 @@
     return sortType;
   };
 
+  // Получение нового массива по выбраному КОЛИЧЕСТВУ КОМНАТ, возвращает массив
+  var getSortRooms = function (arr) {
+    var sortRooms = [];
+    switch (housingRoomsSelect.value) {
+      case 'any':
+        sortRooms = arr.slice();
+        break;
+      default:
+        sortRooms = arr.filter(function (offer) {
+          return offer.offer.rooms === parseInt(housingRoomsSelect.value, 10);
+        });
+    }
+    return sortRooms;
+  };
+
+  // Получение нового массива по выбраному КОЛИЧЕСТВУ КОМНАТ, возвращает массив
+  var getSortGuests = function (arr) {
+    var sortGuests = [];
+    switch (housingGuestsSelect.value) {
+      case 'any':
+        sortGuests = arr.slice();
+        break;
+      default:
+        sortGuests = arr.filter(function (offer) {
+          return offer.offer.guests === parseInt(housingGuestsSelect.value, 10);
+        });
+    }
+    return sortGuests;
+  };
+
+
+  // Функция которая считает, сколько в первом массиве совпадений со вторым массивом
+  var countOfSameFeatures = function (offerFeatures, requiredFeatures) {
+    var count = 0;
+    for (var i = 0; i < requiredFeatures.length; i++) {
+      if (offerFeatures.indexOf(requiredFeatures[i]) >= 0) {
+        count++;
+      }
+    }
+    return count;
+  };
+
+  // Сортировка по приемуществам
+  var getSortFeatures = function (arr) {
+    var valuesCheckbox = [];
+    var checkboxArr = mapFilter.querySelectorAll('input[type="checkbox"]:checked'); // Находим колекцию зачеканных преимуществ
+    checkboxArr.forEach(function (checkbox) {
+      valuesCheckbox.push(checkbox.value); // Добавялем в массив все их значения
+    });
+    var sotrFeatures = [];
+
+    switch (valuesCheckbox.length) {
+      case 0:
+        sotrFeatures = arr.slice();
+        break;
+      default:
+        for (var j = 0; j < arr.length; j++) {
+          if (sotrFeatures.length < NUMBER_PINS_ON_MAP) { // Проверка и принудительная что набраны все возможные к отрисовке элементы
+            var offerFeatures = arr[j].offer.features; // Находим сравниваемый массив предложенйи в каждом объявлении
+            if (countOfSameFeatures(offerFeatures, valuesCheckbox) === valuesCheckbox.length) { // Если счетчик найденных элементов = количеству искомых
+              sotrFeatures.push(arr[j]); // То добавляем в нашу выборку
+            }
+          } else {
+            break;
+          }
+        }
+    }
+    return sotrFeatures;
+  };
+
 
   // Функция получения НОВОГО МАССИВА ДАННЫХ при сортировке
   var getSortData = function (data) {
     var sortData = [];
     sortData = getSortType(data); // 1. первая сортировка по типу жилья
     sortData = getSortPrice(sortData); // 2. вторая сортировка по цене
+    sortData = getSortRooms(sortData); // 3. третья сортировка по комнатам
+    sortData = getSortGuests(sortData); // 4. четвертая сортировка по количеству гостей
+    sortData = getSortFeatures(sortData); // 5. пятая сортировка преимуществам
     return getArrMaxLength(sortData);
   };
 
@@ -76,3 +152,4 @@
 
 })()
 ;
+
