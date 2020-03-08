@@ -4,8 +4,9 @@
 
 (function () {
   var mapFilter = document.querySelector('.map__filters'); // Форма №1 .map__filters
-
   var NUMBER_PINS_ON_MAP = 5; // выводить на карту не более 5 меток
+  var housingTypeSelect = mapFilter.querySelector('#housing-type'); // селект с типом жилья
+  var housingPriceSelect = mapFilter.querySelector('#housing-price'); // селект с цены
 
 
   // Функция, которая не дает быть массиву длинее 5 элементов, возвращает массив
@@ -14,29 +15,54 @@
     return maxArrLengt;
   };
 
-  // Проверку нужно ли применять фильтр
-  var itSort = function (select) {
-    if (select.value === 'any') {
-      return false;
+
+  // Получение нового массива по ЦЕНЕ, возвращает массив
+  var getSortPrice = function (arr) {
+    var sortPrice = [];
+    switch (housingPriceSelect.value) {
+      case 'low':
+        sortPrice = arr.filter(function (offer) {
+          return offer.offer.price <= 10000;
+        });
+        break;
+      case 'middle':
+        sortPrice = arr.filter(function (offer) {
+          return (offer.offer.price > 10000 && offer.offer.price < 50000);
+        });
+        break;
+      case 'high':
+        sortPrice = arr.filter(function (offer) {
+          return offer.offer.price >= 50000;
+        });
+        break;
+      default:
+        sortPrice = arr.slice();
     }
-    return true;
+    return sortPrice;
   };
 
-  // Получение нового массива по выбраному селекту жилья, возвращает массив
-  var getSortArrHousingType = function (arr) {
-    var housingTypeSelect = mapFilter.querySelector('#housing-type'); // селект с типом жилья
-    var sortArr = arr.slice();
-    if (itSort(housingTypeSelect)) {
-      sortArr = arr.filter(function (offer) {
-        return offer.offer.type === housingTypeSelect.value;
-      });
+
+  // Получение нового массива по выбраному ТИПУ жилья, возвращает массив
+  var getSortType = function (arr) {
+    var sortType = [];
+    switch (housingTypeSelect.value) {
+      case 'any':
+        sortType = arr.slice();
+        break;
+      default:
+        sortType = arr.filter(function (offer) {
+          return offer.offer.type === housingTypeSelect.value;
+        });
     }
-    return sortArr;
+    return sortType;
   };
 
-  // Функция получения новых данных при сортировке
+
+  // Функция получения НОВОГО МАССИВА ДАННЫХ при сортировке
   var getSortData = function (data) {
-    var sortData = getSortArrHousingType(data); // 1. первая сортировка по типу жилья
+    var sortData = [];
+    sortData = getSortType(data); // 1. первая сортировка по типу жилья
+    sortData = getSortPrice(sortData); // 2. вторая сортировка по цене
     return getArrMaxLength(sortData);
   };
 
@@ -46,4 +72,3 @@
 
 })()
 ;
-
