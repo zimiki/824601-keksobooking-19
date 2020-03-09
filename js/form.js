@@ -55,22 +55,10 @@
     }
   };
 
-  // Обработчик изменения селекта time
+  // Обработчик определение минимальной цены c использованием словаря минимальных цен
   var setMinPrice = function () {
-    var type = typeSelect.value;
-    var minPrice = 0;
-    if (type === 'bungalo') {
-      minPrice = 0;
-    } else if (type === 'flat') {
-      minPrice = 1000;
-
-    } else if (type === 'house') {
-      minPrice = 5000;
-    } else {
-      minPrice = 10000;
-    }
-    priceInput.min = minPrice;
-    priceInput.placeholder = minPrice;
+    priceInput.min = window.util.minPriceList[typeSelect.value];
+    priceInput.placeholder = window.util.minPriceList[typeSelect.value];
   };
 
   var onTypeSelectChange = function () {
@@ -119,13 +107,7 @@
     window.map.close();
   };
 
-
-  /*
-  ----------------------------------------------------------------
-           О Т П Р А В К А
-*/
-
-  // УСПЕХ
+  // УСПЕХ - ЗАГРУЗИЛИСЬ ДАННЫЕ
   var onSuccessSubmit = function () { // случай успешной отправки
     var successMessage = successTemplate.cloneNode(true); // отрисовка собщения об успешной отправки
     main.insertAdjacentElement('afterbegin', successMessage);
@@ -150,7 +132,7 @@
     successMessage.remove();
   };
 
-  // ОШИБКА
+  // ОШИБКА - ДАННЫЕ НЕ ЗАГРУЗИЛИСЬ
   var onErrorSubmit = function () { // случай ошибки отправки
     var errorMessage = errorTemplate.cloneNode(true);
     main.insertAdjacentElement('afterbegin', errorMessage);
@@ -197,13 +179,14 @@
       roomSelect.addEventListener('change', onRoomSelectChange); // Валидация значений при смене количества комнат
       capacitySelect.addEventListener('change', onRoomSelectChange); // Валидация значений при смене количества комнат
       resetButton.addEventListener('click', onButtonResetClik);
-      adForm.addEventListener('submit', onButtonSubmitClick); // !!! НОВОЕ ЗАДАНИЕ
+      adForm.addEventListener('submit', onButtonSubmitClick);
     }
   };
 
   // Функция, которая приводит формы в неактивное состояние и убирает обработчики событий
   var inactiveForm = function () {
     adForm.reset(); // сброс формы
+    mapFilter.reset(); // сброс формы
     adForm.classList.add('ad-form--disabled');
     inactiveFormInput(mapFilter);
     inactiveFormInput(adForm);

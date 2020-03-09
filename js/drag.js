@@ -105,6 +105,7 @@
       switch (evt.button) { // Проверка на то что клик приходит с левой кнопки мыши
         case window.util.LEFT_MOUSE_BUTTON:
           window.map.open();
+
           window.form.activeForm();
           slider(evt);
       }
