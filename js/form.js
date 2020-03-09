@@ -179,13 +179,14 @@
       roomSelect.addEventListener('change', onRoomSelectChange); // Валидация значений при смене количества комнат
       capacitySelect.addEventListener('change', onRoomSelectChange); // Валидация значений при смене количества комнат
       resetButton.addEventListener('click', onButtonResetClik);
-      adForm.addEventListener('submit', onButtonSubmitClick); // !!! НОВОЕ ЗАДАНИЕ
+      adForm.addEventListener('submit', onButtonSubmitClick);
     }
   };
 
   // Функция, которая приводит формы в неактивное состояние и убирает обработчики событий
   var inactiveForm = function () {
     adForm.reset(); // сброс формы
+    mapFilter.reset(); // сброс формы
     adForm.classList.add('ad-form--disabled');
     inactiveFormInput(mapFilter);
     inactiveFormInput(adForm);

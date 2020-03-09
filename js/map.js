@@ -5,12 +5,27 @@
 (function () {
   var map = document.querySelector('.map');
   var mapFilter = document.querySelector('.map__filters'); // Форма №1 .map__filters
+  var offersData = [];
 
 
   var renderMapPins = function (arr) {
     var fragmentWithPins = window.util.getFragment(arr, window.pin.render);
     map.querySelector('.map__pins').appendChild(fragmentWithPins); // Добавление фрагмента c pin в DOM
     window.pin.addAllClickListener(arr);
+  };
+
+  // Функция, которая получает отсортированную дату и отрисовывает пины
+  var renderSortPins = function () {
+    var newSort = window.sort.get(offersData);
+    renderMapPins(newSort);
+  };
+
+
+  // Обработчик события смены чего то в фильтрах
+  var onMapFilterCange = function () {
+    window.card.remove();
+    window.pin.removeAllNew();
+    renderSortPins();
   };
 
 
@@ -21,18 +36,10 @@
       loadErrorMessage.remove();
     }
 
-    // Обработчик события смены чего то в фильтрах
-    var onMapFilterCange = function () {
-      window.card.remove();
-      window.pin.removeAllNew();
-      var newSort = window.sort.get(data);
-      renderMapPins(newSort);
-    };
-
+    offersData = data;
     map.classList.remove('map--faded'); // Снимает неактивное состояние .map содержит класс map--faded;
-    var offers = window.sort.get(data); // Определение данных на отрисовку
-    renderMapPins(offers);
-    mapFilter.addEventListener('change', onMapFilterCange); // !!! ВОПРОС КАК ЕГО СНЯТЬ ПРИ ЗАКРЫТИИ КАРТЫ ???
+    renderSortPins();
+    mapFilter.addEventListener('change', onMapFilterCange);
   };
 
   // Если не успешно загрузились данные, нет шаблона для отображения этого события. Использован пример из лекции
@@ -60,6 +67,7 @@
     map.classList.add('map--faded');
     window.card.remove();
     window.pin.removeAllNew();
+    mapFilter.removeEventListener('change', onMapFilterCange);
   };
 
   window.map = {
