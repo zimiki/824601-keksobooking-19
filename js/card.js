@@ -59,25 +59,25 @@
   // Функция вставки нового элемента в DOM
   var addOfferCard = function (offer) {
     if (map.querySelector('.popup')) { // Проверяем была ли до этого вызвана карточка, если она вызвана, нужно ее убрать
-      removeCard();
+      onPopupCloseClik();
     }
     var card = renderOfferCard(offer); // Вызываем функцию отрисовки карточки
     map.insertBefore(card, referenceElement); // Вставка card в карту
     var cardPopup = map.querySelector('.popup'); // После того как вставили находим этот карточку
-    cardPopup.querySelector('.popup__close').addEventListener('click', removeCard); // при вставке элемента навешиваем обоаботчики его удаления
+    cardPopup.querySelector('.popup__close').addEventListener('click', onPopupCloseClik); // при вставке элемента навешиваем обоаботчики его удаления
   };
 
   // Функция, которая удаляет все вставленные фрагметом метки объявлений
-  var removeCard = function () {
+  var onPopupCloseClik = function () {
     var cardPopup = map.querySelector('.popup');
     if (cardPopup) {
-      cardPopup.querySelector('.popup__close').removeEventListener('click', removeCard);
+      cardPopup.querySelector('.popup__close').removeEventListener('click', onPopupCloseClik);
       cardPopup.remove();
     }
   };
 
   window.card = {
-    remove: removeCard,
+    remove: onPopupCloseClik,
     add: addOfferCard
   };
 

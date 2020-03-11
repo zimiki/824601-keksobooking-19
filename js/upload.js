@@ -2,11 +2,11 @@
 
 // Модуль, который отвечает за отправку формы
 (function () {
+  var TIMEOUT_IN_MS = 10000;
   var URL = 'https://js.dump.academy/keksobooking';
   var StatusCode = {
     OK: 200
   };
-  var TIMEOUT_IN_MS = 10000;
 
 
   window.upload = function (data, onSuccess, onError) {

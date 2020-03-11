@@ -106,7 +106,7 @@
         case window.util.LEFT_MOUSE_BUTTON:
           window.map.open();
 
-          window.form.activeForm();
+          window.form.active();
           slider(evt);
       }
     }
@@ -115,7 +115,7 @@
   var onMainPinKeydown = function (evt) {
     if (evt.key === window.util.ENTER_KEY) {
       window.map.open();
-      window.form.activeForm(evt);
+      window.form.active(evt);
     }
   };
 

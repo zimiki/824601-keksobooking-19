@@ -112,7 +112,7 @@
     var successMessage = successTemplate.cloneNode(true); // отрисовка собщения об успешной отправки
     main.insertAdjacentElement('afterbegin', successMessage);
     document.addEventListener('keydown', onSuccessEscKeydown); // Сообщение должно исчезать по нажатию на клавишу Esc
-    document.addEventListener('click', removeSuccessMessage); // Сообщение должно исчезать по клику на произвольную область экрана
+    document.addEventListener('click', onSuccessMessageClick); // Сообщение должно исчезать по клику на произвольную область экрана
     inactiveForm(); // сбрасывает форму и возвращает страницу в неактивное состояние
     window.map.close();
   };
@@ -120,15 +120,15 @@
   // Обработчик события нажатия кнопки ESC для закрытия собщения
   var onSuccessEscKeydown = function (evt) {
     if (evt.key === window.util.ESC_KEY) {
-      removeSuccessMessage();
+      onSuccessMessageClick();
     }
   };
 
   // Функция, которая убирает собщение об УСПЕШНОЙ и удаляет все обработчики
-  var removeSuccessMessage = function () {
+  var onSuccessMessageClick = function () {
     var successMessage = main.querySelector('.success');
     document.removeEventListener('keydown', onSuccessEscKeydown);
-    document.removeEventListener('click', removeSuccessMessage);
+    document.removeEventListener('click', onSuccessMessageClick);
     successMessage.remove();
   };
 
@@ -136,23 +136,23 @@
   var onErrorSubmit = function () { // случай ошибки отправки
     var errorMessage = errorTemplate.cloneNode(true);
     main.insertAdjacentElement('afterbegin', errorMessage);
-    main.querySelector('.error__button').addEventListener('click', removeErrorMessage); // Cообщение должно исчезать после нажатия на кнопку .error__button
-    document.addEventListener('click', removeErrorMessage); // Сообщение должно исчезать по клику на произвольную область экрана
+    main.querySelector('.error__button').addEventListener('click', onErrorMessageClick); // Cообщение должно исчезать после нажатия на кнопку .error__button
+    document.addEventListener('click', onErrorMessageClick); // Сообщение должно исчезать по клику на произвольную область экрана
     document.addEventListener('keydown', onErrorEscKeydown); // Сообщение должно исчезать по нажатию на клавишу Esc
   };
 
   // Обработчик события нажатия кнопки ESC для закрытия собщения
   var onErrorEscKeydown = function (evt) {
     if (evt.key === window.util.ESC_KEY) {
-      removeErrorMessage();
+      onErrorMessageClick();
     }
   };
 
   // Функция, которая убирает собщение об ОШИБКЕ и удаляет все обработчики
-  var removeErrorMessage = function () {
+  var onErrorMessageClick = function () {
     var errorMessage = main.querySelector('.error');
-    main.querySelector('.error__button').removeEventListener('click', removeErrorMessage);
-    document.removeEventListener('click', removeErrorMessage);
+    main.querySelector('.error__button').removeEventListener('click', onErrorMessageClick);
+    document.removeEventListener('click', onErrorMessageClick);
     document.removeEventListener('keydown', onErrorEscKeydown);
     errorMessage.remove();
   };
@@ -207,7 +207,7 @@
 
 
   window.form = {
-    activeForm: activeForm,
+    active: activeForm,
     setCoordsAdress: setCoordsAdress
   };
 
