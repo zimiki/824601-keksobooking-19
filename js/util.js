@@ -20,9 +20,9 @@
   // Функция создания фрагмента, принимает массив данных и функцию отрисовки элемента
   var getFragment = function (arr, renderElement) {
     var fragment = document.createDocumentFragment();
-    for (var i = 0; i < arr.length; i++) {
-      fragment.appendChild(renderElement(arr[i]));
-    }
+    arr.forEach(function (element) {
+      fragment.appendChild(renderElement(element));
+    });
     return fragment;
   };
 

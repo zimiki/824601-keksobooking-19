@@ -22,11 +22,11 @@
 
 
   // Обработчик события смены чего то в фильтрах
-  var onMapFilterCange = function () {
+  var onMapFilterCange = window.debounce(function () {
     window.card.remove();
     window.pin.removeAllNew();
     renderSortPins();
-  };
+  });
 
 
   // Если успешно загрузились данные

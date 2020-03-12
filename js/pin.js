@@ -42,11 +42,12 @@
   // 3. Функция, которая удаляет все вставленные фрагметом метки объявлений
   var removeNewPins = function () {
     var newMapPins = mapPins.querySelectorAll('.map__pin');
-    for (var i = 0; i < newMapPins.length; i++) {
-      if (!newMapPins[i].classList.contains('map__pin--main')) {
-        mapPins.removeChild(newMapPins[i]);
+
+    newMapPins.forEach(function (newPin) {
+      if (!newPin.classList.contains('map__pin--main')) {
+        mapPins.removeChild(newPin);
       }
-    }
+    });
   };
 
   window.pin = {

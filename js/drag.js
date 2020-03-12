@@ -5,8 +5,8 @@
 (function () {
   var HALF_MAIN_PIN_WIDTH = 32; // Ширина главной метки
   var MAIN_PIN_HEIGHT = 84; // Высота главной метки
-  var Y_MIN_DRAG = 130; // Параметры по ТЗ
-  var Y_MAX_DRAG = 600;
+  var MAP_TOP_BORDER = 130; // Параметры по ТЗ
+  var MAP_BOTTOM_BORDER = 120; // 630 = это высота карты 750-120
   var map = document.querySelector('.map');
   var mainPin = map.querySelector('.map__pin--main');
 
@@ -22,69 +22,70 @@
     return centerMapCoord;
   };
 
+
   // Функция, которая учитывает поправки на передачу координат ГЛАВНОЙ метки  (левого вехнего угла--> острого конца)
   var getMainPinMarkCoord = function () {
     var markCoord = {
-      x: parseInt(mainPin.style.left, 10) + HALF_MAIN_PIN_WIDTH, // получим координаты для остного конца метки(правее +(ширины/2), ниже +высоты)
+      x: parseInt(mainPin.style.left, 10) + HALF_MAIN_PIN_WIDTH,
       y: parseInt(mainPin.style.top, 10) + MAIN_PIN_HEIGHT
     };
     return (markCoord);
   };
 
-
-  // Функция которая проверяет лимиты
-  var checkLimits = function (coord, min, max) {
-    if (coord < min) {
-      return false;
-    }
-    if (coord > max) {
-      return false;
-    }
-    return true;
-  };
-
-  // Функции для определения лимитов, в пределах которых учитываются события mouseMove
-  var getLimitsX = function (evt, sliderArea) {
+  // Функция для определения лимитов на разных экранах
+  var getMapLimits = function () {
+    var mapParameters = map.getBoundingClientRect();
     var limits = {
-      min: sliderArea.x - HALF_MAIN_PIN_WIDTH + evt.offsetX, // минимум = положение map Сlient - учет для острого конца метки + учет где на метке был Click
-      max: sliderArea.x + sliderArea.width - HALF_MAIN_PIN_WIDTH + evt.offsetX, // // максимум = конец положения map Сlient - учет для острого конца метки + учет где на метке был Click
+      minX: 0 - HALF_MAIN_PIN_WIDTH,
+      maxX: mapParameters.width - HALF_MAIN_PIN_WIDTH,
+      minY: MAP_TOP_BORDER - MAIN_PIN_HEIGHT,
+      maxY: mapParameters.height - MAP_BOTTOM_BORDER - MAIN_PIN_HEIGHT
     };
     return limits;
   };
-
-  var getLimitsY = function (evt, sliderArea) {
-    var limits = {
-      min: sliderArea.y + Y_MIN_DRAG + evt.offsetY, // минимум = по ТЗ + учет где на метке был Click
-      max: sliderArea.y + Y_MAX_DRAG + evt.offsetY // максимум = по ТЗ + учет где на метке был Click
-    };
-    return limits;
-  };
-
 
   // Функция слайдер
   var slider = function (evt) {
     evt.preventDefault();
-    var mapParameters = map.getBoundingClientRect(); // положение карты относительно Сlient, потому что берем положение курсора тоже относительно Сlient
-    var limitsX = getLimitsX(evt, mapParameters);
-    var limitsY = getLimitsY(evt, mapParameters);
+    var limitsMap = getMapLimits();
+    var currentCursorCoords = {
+      x: evt.clientX,
+      y: evt.clientY
+    };
 
     var onMouseMove = function (moveEvt) {
-      moveEvt.preventDefault();
-      // Координаты пина определяются так:
-      // 1. Вычисляется смещение координат по карте в одной системе исчисления client (значение движения - значение начала карты)
-      // 2. Добавляется поправка чтобы не прыгала - эти параметры где было событие click внутри элемента
-      var mainPinCoords = {
-        x: Math.floor(moveEvt.clientX - mapParameters.x - evt.offsetX),
-        y: Math.floor(moveEvt.clientY - mapParameters.y - evt.offsetY)
+
+      var getNewCoordX = function (min, max) {
+        var shiftX = currentCursorCoords.x - moveEvt.clientX;
+        var coordinateX = (mainPin.offsetLeft - shiftX);
+        if (coordinateX < min) {
+          coordinateX = min;
+        }
+        if (coordinateX > max) {
+          coordinateX = max;
+        }
+        return coordinateX;
       };
 
-      // Используем фунцию проверки лимитов с тремя параметрами: 1.координта 2. максимум 3.минимум
-      if (checkLimits(moveEvt.clientX, limitsX.min, limitsX.max)) {
-        mainPin.style.left = mainPinCoords.x + 'px';
-      }
-      if (checkLimits(moveEvt.clientY, limitsY.min, limitsY.max)) {
-        mainPin.style.top = mainPinCoords.y + 'px';
-      }
+      var getNewCoordY = function (min, max) {
+        var shiftY = currentCursorCoords.y - moveEvt.clientY;
+        var coordinateY = mainPin.offsetTop - shiftY;
+        if (coordinateY < min) {
+          coordinateY = min;
+        }
+        if (coordinateY > max) {
+          coordinateY = max;
+        }
+        return coordinateY;
+      };
+
+      mainPin.style.left = getNewCoordX(limitsMap.minX, limitsMap.maxX) + 'px';
+      mainPin.style.top = getNewCoordY(limitsMap.minY, limitsMap.maxY) + 'px';
+
+      currentCursorCoords = {
+        x: moveEvt.clientX,
+        y: moveEvt.clientY
+      };
 
       // Записываем адрес
       window.form.setCoordsAdress(getMainPinMarkCoord());
@@ -105,9 +106,9 @@
       switch (evt.button) { // Проверка на то что клик приходит с левой кнопки мыши
         case window.util.LEFT_MOUSE_BUTTON:
           window.map.open();
-
           window.form.active();
           slider(evt);
+          break;
       }
     }
   };

@@ -16,28 +16,38 @@
   var successTemplate = document.querySelector('#success').content.querySelector('.success');
   var errorTemplate = document.querySelector('#error').content.querySelector('.error');
 
-  // Функция, которая УСТАНАВЛИВАЕТ неактивное состояние на <input> и <select> формы с помощью атрибута disabled
+  // Функция, которая УСТАНАВЛИВАЕТ неактивное состояние на <input> и <select> <textarea> формы с помощью атрибута disabled
   var inactiveFormInput = function (form) {
     var allInput = form.querySelectorAll('input');
     var allSelect = form.querySelectorAll('select');
-    for (var i = 0; i < allInput.length; i++) {
-      allInput[i].setAttribute('disabled', 'disabled');
-    }
-    for (var j = 0; j < allSelect.length; j++) {
-      allSelect[j].setAttribute('disabled', 'disabled');
-    }
+    var allTextArea = form.querySelectorAll('textarea');
+
+    allInput.forEach(function (intut) {
+      intut.setAttribute('disabled', 'disabled');
+    });
+    allSelect.forEach(function (select) {
+      select.setAttribute('disabled', 'disabled');
+    });
+    allTextArea.forEach(function (area) {
+      area.setAttribute('disabled', 'disabled');
+    });
   };
 
-  // Функция, которая СНИМАЕТ неактивное состояние на <input> и <select>
+  // Функция, которая СНИМАЕТ неактивное состояние на <input> и <select> <textarea>
   var activeFormInput = function (form) {
     var allInput = form.querySelectorAll('input');
     var allSelect = form.querySelectorAll('select');
-    for (var i = 0; i < allInput.length; i++) {
-      allInput[i].removeAttribute('disabled');
-    }
-    for (var j = 0; j < allSelect.length; j++) {
-      allSelect[j].removeAttribute('disabled');
-    }
+    var allTextArea = form.querySelectorAll('textarea');
+
+    allInput.forEach(function (intut) {
+      intut.removeAttribute('disabled');
+    });
+    allSelect.forEach(function (select) {
+      select.removeAttribute('disabled');
+    });
+    allTextArea.forEach(function (area) {
+      area.removeAttribute('disabled');
+    });
   };
 
   // Обработчик изменения priceInput
