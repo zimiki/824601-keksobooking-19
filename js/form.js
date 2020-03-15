@@ -21,6 +21,7 @@
     var allInput = form.querySelectorAll('input');
     var allSelect = form.querySelectorAll('select');
     var allTextArea = form.querySelectorAll('textarea');
+    var allButton = form.querySelectorAll('button');
 
     allInput.forEach(function (intut) {
       intut.setAttribute('disabled', 'disabled');
@@ -31,6 +32,9 @@
     allTextArea.forEach(function (area) {
       area.setAttribute('disabled', 'disabled');
     });
+    allButton.forEach(function (button) {
+      button.setAttribute('disabled', 'disabled');
+    });
   };
 
   // Функция, которая СНИМАЕТ неактивное состояние на <input> и <select> <textarea>
@@ -38,6 +42,7 @@
     var allInput = form.querySelectorAll('input');
     var allSelect = form.querySelectorAll('select');
     var allTextArea = form.querySelectorAll('textarea');
+    var allButton = form.querySelectorAll('button');
 
     allInput.forEach(function (intut) {
       intut.removeAttribute('disabled');
@@ -48,6 +53,10 @@
     allTextArea.forEach(function (area) {
       area.removeAttribute('disabled');
     });
+    allButton.forEach(function (button) {
+      button.removeAttribute('disabled');
+    });
+
   };
 
   // Обработчик изменения priceInput

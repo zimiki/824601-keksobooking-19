@@ -16,28 +16,21 @@
     return offerElement;
   };
 
-
   // 2.Функция которая добавляет на все новые метки обработчик события клик
   var addAllPinsClickListener = function (arr) {
-    var newMapPins = mapPins.querySelectorAll('.map__pin'); // Найдем массив новых меток
-
-    // Функция замыкания, чтобы создать отдельное событие для каждой метки в отдельности
-    var addPinClickListener = function (pin, j) {
+    var newMapPins = mapPins.querySelectorAll('.map__pin:not(.map__pin--main)'); // Найдем массив новых меток
+    var addPinClickListener = function (pin, index) {
       var onPinClick = function () {
-        var numberOffer = j - 1; // на 1 меньше потому, что массив newMapPins начинается с mainPin
-        window.card.add(arr[numberOffer]);
+        window.card.add(arr[index]);
       };
       // Добавление обработчиков
       pin.addEventListener('click', onPinClick);
     };
 
-    // Цикл для установки обработчки на каждый пин кроме первого, потому что перый - главная метка
-    for (var j = 1; j < newMapPins.length; j++) {
-      var pin = newMapPins[j];
-      addPinClickListener(pin, j);
-    }
+    newMapPins.forEach(function (pin, index) {
+      addPinClickListener(pin, index);
+    });
   };
-
 
   // 3. Функция, которая удаляет все вставленные фрагметом метки объявлений
   var removeNewPins = function () {
